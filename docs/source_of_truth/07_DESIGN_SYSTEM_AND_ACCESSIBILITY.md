@@ -20,6 +20,25 @@ It should not feel:
 - like a generic AI chatbot
 - like an infinite social feed
 
+## Brand system
+
+Approved direction: The Opening.
+
+The mark expresses Curio's core promise: open a system and reveal how it works.
+
+Brand-mark rules:
+- Ink is the structural anchor.
+- Orange/yellow is the leading opening plane.
+- Purple and green appear as inner/depth planes.
+- The mark must remain legible at small sizes and in monochrome.
+- The wordmark and tagline are separate from the core mark so compact UI can use the mark alone.
+
+Approved illustration principle: Reveal the mechanism.
+
+Visuals should expose hidden structure through layers, flows, cycles, connections and cutaways. The mechanism is the subject; illustration is not decorative filler.
+
+Functional UI icons use a consistent simple line language. Their container/state may use Curio colors, but meaning must not depend on color alone.
+
 ## Current implementation palette
 
 - Orange: #FF643D
