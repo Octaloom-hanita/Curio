@@ -20,6 +20,30 @@ It should not feel:
 - like a generic AI chatbot
 - like an infinite social feed
 
+## Brand mark and visual thesis
+
+Official logo direction: **The Opening**.
+
+The mark suggests opening a system and seeing what is happening inside. It should not be treated as a literal book, door, brain or AI symbol.
+
+Official illustration principle: **Reveal the mechanism**.
+
+The visual system should make mechanisms visible through:
+- layers
+- flows
+- cycles
+- connections
+- cutaways
+- restrained spot illustrations
+
+Black/ink anchors the system. Orange leads. Purple, green, blue and yellow support functional distinctions and explanatory structure.
+
+Reference workflow:
+- use Impeccable as the UI craft/critique/polish framework
+- use VoltAgent/awesome-design-md as a reference library, including strong editorial/audio product patterns
+- do not copy gradients, layouts, typography or brand devices from references
+- Curio keeps its own visual language and accessibility rules
+
 ## Current implementation palette
 
 - Orange: #FF643D
@@ -84,11 +108,22 @@ On large screens, constrain readable line length rather than stretching text.
 
 ## Illustration language
 
+Production illustrations and icons should be reusable assets/components rather than screenshots cropped from concept boards.
+
 Illustrations should:
 - clarify mechanisms
 - use simple bold educational forms
 - support motion/flow/structure
 - remain secondary to the explanation
+- stay legible at older-adult text scales
+- use a consistent stroke/shape grammar across subject areas
+- avoid encoding meaning by color alone
+
+For reusable UI icons:
+- keep the core SVG/icon geometry independent from its circular background
+- add color/background in the UI layer when possible
+- label unfamiliar icons
+- preserve at least 56px touch targets for primary actions
 
 Avoid literal decorative illustrations that create ambiguity.
 

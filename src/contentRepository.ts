@@ -1,4 +1,4 @@
-import type { IconName } from './Visuals';
+import type { IconName } from './IconSystem';
 import type { Topic } from './topics';
 
 const SUPABASE_URL = 'https://quxhnwpbrkiisrseaexs.supabase.co';

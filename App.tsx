@@ -22,7 +22,8 @@ import {
 import { AppText, AppTextScaleProvider } from './src/AppText';
 import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
-import { CurioIcon, CurioScene, type SceneName } from './src/Visuals';
+import { CurioIcon } from './src/IconSystem';
+import { CurioScene, type SceneName } from './src/Visuals';
 import { topics as fallbackTopics, type Topic } from './src/topics';
 import { loadApprovedTopics } from './src/contentRepository';
 
@@ -231,7 +232,7 @@ function TopicCard({
           { backgroundColor: accentMap[topic.color] },
         ]}
       >
-        <CurioIcon name={topic.icon} size={44} fill={colors.surface} />
+        <CurioIcon name={topic.icon} size={40} color={colors.surface} accent={colors.surface} />
       </View>
 
       <View style={styles.topicCopy}>
@@ -311,7 +312,7 @@ function HomeScreen({
       )}
 
       <View style={styles.honestyNote}>
-        <CurioIcon name="bulb" size={42} fill={colors.yellow} />
+        <CurioIcon name="bulb" size={42} color={colors.ink} accent={colors.yellow} />
         <AppText variant="bodySmall">{copy.onlyOneReady}</AppText>
       </View>
 
@@ -652,7 +653,7 @@ export default function App() {
                 {kind === 'recall' && (
                   <>
                     <View style={styles.recallHint}>
-                      <CurioIcon name="bulb" size={40} fill={colors.yellow} />
+                      <CurioIcon name="bulb" size={40} color={colors.ink} accent={colors.yellow} />
                       <AppText variant="bodySmall">{copy.ideaNotTerms}</AppText>
                     </View>
 
@@ -686,7 +687,7 @@ export default function App() {
 
                     {evaluationError && (
                       <View style={styles.errorPanel}>
-                        <CurioIcon name="bulb" size={42} fill={colors.yellow} />
+                        <CurioIcon name="bulb" size={42} color={colors.ink} accent={colors.yellow} />
                         <AppText variant="bodySmall">{evaluationError}</AppText>
                       </View>
                     )}
@@ -701,7 +702,8 @@ export default function App() {
                                 : 'network'
                             }
                             size={48}
-                            fill={
+                            color={colors.ink}
+                            accent={
                               evaluation.status === 'understood'
                                 ? colors.green
                                 : colors.purple
