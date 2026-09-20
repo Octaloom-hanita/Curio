@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -24,7 +24,7 @@ import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
 import { CurioIcon, CurioScene, type SceneName } from './src/Visuals';
 import { topics as fallbackTopics, type Topic } from './src/topics';
-import { loadApprovedTopics } from './src/contentRepository';
+import { loadApprovedCatalog, loadApprovedImmersionSteps, type LessonStep } from './src/contentRepository';
 
 type Accent = 'orange' | 'green' | 'purple' | 'blue' | 'yellow';
 type Screen = 'home' | 'lesson';
@@ -392,6 +392,16 @@ export default function App() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const [catalogTopics, setCatalogTopics] = useState<Topic[]>(fallbackTopics);
+  const [lessonSteps, setLessonSteps] = useState<LessonStep[]>([]);
+  const [activeImmersionId, setActiveImmersionId] = useState('immersion_termite_reference');
+  const [isLessonLoading, setIsLessonLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [transcriptNeedsConfirmation, setTranscriptNeedsConfirmation] = useState(false);
+  const mediaRecorderRef = useRef<any>(null);
+  const audioChunksRef = useRef<any[]>([]);
+  const audioStreamRef = useRef<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -412,6 +422,9 @@ export default function App() {
             setAnswer(saved.answer.slice(0, 3000));
           }
           setHasSession(Boolean(saved.hasSession));
+          if (typeof saved.activeImmersionId === 'string') {
+            setActiveImmersionId(saved.activeImmersionId);
+          }
         }
       } catch {
         // Corrupt local state should never block learning.
@@ -425,12 +438,12 @@ export default function App() {
     try {
       window.localStorage.setItem(
         'curio-mvp-state-v1',
-        JSON.stringify({ locale, textScale, index, answer, hasSession })
+        JSON.stringify({ locale, textScale, index, answer, hasSession, activeImmersionId })
       );
     } catch {
       // Storage failure should not block the session.
     }
-  }, [hydrated, locale, textScale, index, answer, hasSession]);
+  }, [hydrated, locale, textScale, index, answer, hasSession, activeImmersionId]);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -441,7 +454,7 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
 
-    loadApprovedTopics().then((remoteTopics) => {
+    loadApprovedCatalog().then((remoteTopics) => {
       if (!cancelled && remoteTopics.length > 0) {
         setCatalogTopics(remoteTopics);
       }
@@ -461,13 +474,23 @@ export default function App() {
   }
 
   const copy = ui[locale];
-  const step = copy.steps[index];
-  const kind = step.kind;
-  const cta = 'cta' in step ? step.cta : undefined;
+  const remoteStep = lessonSteps[index];
+  const localizedRemoteStep = remoteStep?.[locale];
+  const fallbackStep = copy.steps[index];
+  const step: any = localizedRemoteStep
+    ? { ...localizedRemoteStep, kind: remoteStep.kind }
+    : fallbackStep;
+  const kind = step?.kind ?? 'learn';
+  const cta = step?.cta;
+  const totalSteps = lessonSteps.length > 0 ? lessonSteps.length : copy.steps.length;
   const scene = sceneMap[index] ?? 'flow';
   const accent = accentByStep[index] ?? 'green';
-  const summaryIndex = 6;
-  const connectionIndex = 9;
+  const summaryIndex = lessonSteps.length > 0
+    ? Math.max(0, lessonSteps.findIndex((item) => item.kind === 'summary'))
+    : 6;
+  const connectionIndex = lessonSteps.length > 0
+    ? Math.max(0, lessonSteps.findIndex((item) => item.kind === 'connection'))
+    : 9;
 
   const resetEvaluation = () => {
     setEvaluation(null);
@@ -480,17 +503,33 @@ export default function App() {
     resetEvaluation();
   };
 
-  const startTopic = (_topic: Topic) => {
+  const loadLesson = async (immersionId: string) => {
+    setIsLessonLoading(true);
+    const remoteSteps = await loadApprovedImmersionSteps(immersionId);
+    setLessonSteps(remoteSteps);
+    setIsLessonLoading(false);
+  };
+
+  const startTopic = async (topic: Topic) => {
+    if (!topic.immersionId) return;
+    const immersionId = topic.immersionId;
+    setActiveImmersionId(immersionId);
     setScreen('lesson');
     setIndex(0);
     setAnswer('');
     setHasSession(true);
+    setTranscriptNeedsConfirmation(false);
+    setVoiceError(null);
     resetEvaluation();
+    await loadLesson(immersionId);
   };
 
-  const resumeLesson = () => {
+  const resumeLesson = async () => {
     setScreen('lesson');
     resetEvaluation();
+    if (lessonSteps.length === 0) {
+      await loadLesson(activeImmersionId);
+    }
   };
 
   const finishAndHome = () => {
@@ -498,6 +537,9 @@ export default function App() {
     setScreen('home');
     setIndex(0);
     setAnswer('');
+    setLessonSteps([]);
+    setTranscriptNeedsConfirmation(false);
+    setVoiceError(null);
     resetEvaluation();
   };
 
@@ -512,7 +554,7 @@ export default function App() {
 
   const goNext = () => {
     resetEvaluation();
-    setIndex((value) => Math.min(copy.steps.length - 1, value + 1));
+    setIndex((value) => Math.min(totalSteps - 1, value + 1));
   };
 
   const continueAfterEvaluation = () => {
@@ -530,7 +572,125 @@ export default function App() {
     setIndex(summaryIndex);
   };
 
+  const canUseMicrophone =
+    typeof navigator !== 'undefined' &&
+    Boolean((navigator as any).mediaDevices?.getUserMedia) &&
+    typeof (globalThis as any).MediaRecorder !== 'undefined';
+
+  const stopAudioStream = () => {
+    const stream = audioStreamRef.current;
+    if (stream?.getTracks) {
+      stream.getTracks().forEach((track: any) => track.stop());
+    }
+    audioStreamRef.current = null;
+  };
+
+  const transcribeAudio = async (blob: Blob) => {
+    setIsTranscribing(true);
+    setVoiceError(null);
+
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('READ_FAILED'));
+        reader.onloadend = () => resolve(String(reader.result ?? ''));
+        reader.readAsDataURL(blob);
+      });
+
+      const audioBase64 = dataUrl.split(',')[1] ?? '';
+      if (!audioBase64) throw new Error('EMPTY_AUDIO');
+
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          audioBase64,
+          mimeType: blob.type || 'audio/webm',
+          locale,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok || typeof data?.transcript !== 'string') {
+        throw new Error(data?.error || 'TRANSCRIPTION_FAILED');
+      }
+
+      setAnswer(data.transcript.trim());
+      setTranscriptNeedsConfirmation(true);
+      setEvaluation(null);
+      setEvaluationError(null);
+    } catch {
+      setVoiceError(
+        locale === 'ru'
+          ? 'Не удалось расшифровать запись. Можно записать ещё раз или ответить текстом.'
+          : 'The recording could not be transcribed. You can record again or answer by typing.'
+      );
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  const startRecording = async () => {
+    if (!canUseMicrophone || isRecording || isTranscribing) return;
+
+    setVoiceError(null);
+    setTranscriptNeedsConfirmation(false);
+
+    try {
+      const stream = await (navigator as any).mediaDevices.getUserMedia({
+        audio: true,
+      });
+      audioStreamRef.current = stream;
+      audioChunksRef.current = [];
+
+      const Recorder = (globalThis as any).MediaRecorder;
+      const recorder = new Recorder(stream);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (event: any) => {
+        if (event?.data?.size > 0) audioChunksRef.current.push(event.data);
+      };
+
+      recorder.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, {
+          type: recorder.mimeType || 'audio/webm',
+        });
+        audioChunksRef.current = [];
+        stopAudioStream();
+        setIsRecording(false);
+        if (blob.size > 0) await transcribeAudio(blob);
+      };
+
+      recorder.start();
+      setIsRecording(true);
+    } catch {
+      stopAudioStream();
+      setIsRecording(false);
+      setVoiceError(
+        locale === 'ru'
+          ? 'Не удалось получить доступ к микрофону. Можно продолжить текстом.'
+          : 'Microphone access was not available. You can continue by typing.'
+      );
+    }
+  };
+
+  const stopRecording = () => {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.stop();
+    }
+  };
+
   const evaluateAnswer = async () => {
+    if (transcriptNeedsConfirmation) {
+      setEvaluationError(
+        locale === 'ru'
+          ? 'Сначала проверьте и подтвердите расшифровку записи.'
+          : 'Please review and confirm the transcript first.'
+      );
+      return;
+    }
+
     const clean = answer.trim();
 
     if (clean.length < 8) {
@@ -597,10 +757,19 @@ export default function App() {
               <>
                 <LessonProgress
                   index={index}
-                  total={copy.steps.length}
+                  total={totalSteps}
                   locale={locale}
                   onBack={goBack}
                 />
+
+                {isLessonLoading && (
+                  <View style={styles.aiPanel}>
+                    <ActivityIndicator size="large" color={colors.purple} />
+                    <AppText variant="bodySmall">
+                      {locale === 'ru' ? 'Загружаю исследование...' : 'Loading exploration...'}
+                    </AppText>
+                  </View>
+                )}
 
                 {[1, 2, 3, 4, 5, 9].includes(index) && (
                   <View style={styles.sceneBlock}>
@@ -656,6 +825,37 @@ export default function App() {
                       <AppText variant="bodySmall">{copy.ideaNotTerms}</AppText>
                     </View>
 
+                    {canUseMicrophone && (
+                      <View style={styles.voicePanel}>
+                        <AppText variant="label">
+                          {locale === 'ru' ? 'Ответ голосом' : 'Answer by voice'}
+                        </AppText>
+                        <PrimaryButton
+                          label={
+                            isRecording
+                              ? locale === 'ru'
+                                ? 'Остановить запись'
+                                : 'Stop recording'
+                              : isTranscribing
+                              ? locale === 'ru'
+                                ? 'Расшифровываю...'
+                                : 'Transcribing...'
+                              : locale === 'ru'
+                              ? 'Записать ответ'
+                              : 'Record answer'
+                          }
+                          onPress={isRecording ? stopRecording : startRecording}
+                          accent={isRecording ? 'orange' : 'purple'}
+                          disabled={isTranscribing}
+                        />
+                        {voiceError && (
+                          <AppText variant="bodySmall" color="muted">
+                            {voiceError}
+                          </AppText>
+                        )}
+                      </View>
+                    )}
+
                     <TextInput
                       accessibilityLabel={copy.answerPlaceholder}
                       multiline
@@ -676,6 +876,27 @@ export default function App() {
                         },
                       ]}
                     />
+
+                    {transcriptNeedsConfirmation && (
+                      <View style={styles.transcriptPanel}>
+                        <AppText variant="title">
+                          {locale === 'ru' ? 'Проверьте расшифровку' : 'Review the transcript'}
+                        </AppText>
+                        <AppText variant="bodySmall" color="muted">
+                          {locale === 'ru'
+                            ? 'Исправьте текст, если нужно, и подтвердите его перед проверкой понимания.'
+                            : 'Edit the text if needed, then confirm it before evaluation.'}
+                        </AppText>
+                        <PrimaryButton
+                          label={locale === 'ru' ? 'Подтвердить текст' : 'Confirm transcript'}
+                          onPress={() => {
+                            setTranscriptNeedsConfirmation(false);
+                            setEvaluationError(null);
+                          }}
+                          accent="green"
+                        />
+                      </View>
+                    )}
 
                     {isEvaluating && (
                       <View style={styles.aiPanel}>
@@ -1126,6 +1347,24 @@ const styles = StyleSheet.create({
     fontFamily: 'GolosText_400Regular',
     color: colors.text,
     textAlignVertical: 'top',
+  },
+  voicePanel: {
+    marginTop: spacing.lg,
+    gap: spacing.md,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  transcriptPanel: {
+    marginTop: spacing.lg,
+    gap: spacing.md,
+    padding: spacing.lg,
+    backgroundColor: '#EEF8F2',
+    borderLeftWidth: 5,
+    borderLeftColor: colors.green,
+    borderRadius: radius.control,
   },
   aiPanel: {
     marginTop: spacing.lg,
