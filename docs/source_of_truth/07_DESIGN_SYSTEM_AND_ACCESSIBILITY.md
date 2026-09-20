@@ -20,6 +20,19 @@ It should not feel:
 - like a generic AI chatbot
 - like an infinite social feed
 
+## Brand mark and visual thesis
+
+Official logo direction: **The Opening**.
+
+Official illustration principle: **Reveal the mechanism**.
+
+The visual system should make mechanisms visible through layers, flows, cycles, connections and cutaways. Black/ink anchors the system. Orange leads. Purple, green, blue and yellow support explanatory structure.
+
+Reference workflow:
+- use Impeccable as the UI craft/critique/polish framework
+- use VoltAgent/awesome-design-md as a reference library, not a template to copy
+- Curio keeps its own visual language and accessibility rules
+
 ## Current implementation palette
 
 - Orange: #FF643D
@@ -93,6 +106,18 @@ Illustrations should:
 Avoid literal decorative illustrations that create ambiguity.
 
 The termite MVP therefore uses abstract airflow/temperature/cycle visuals instead of a literal termite-mound character.
+
+### Production visual asset families
+
+Current code-level visual system:
+- `src/BrandSystem.tsx` - reusable implementation of The Opening mark
+- `src/IconSystem.tsx` - navigation, learning, audio/voice, feedback, utility and discovery icons
+- `src/IllustrationSystem.tsx` - mechanism illustrations, topic visuals and empty-state illustrations
+- `src/Visuals.tsx` - maps learning scenes to the production illustration system
+
+Discovery cards use dedicated topic visuals when available. Mechanism illustrations sit on quiet bounded surfaces while explanatory text remains dominant.
+
+Bottom navigation is visible on discovery/home surfaces, where it supports orientation without interrupting the bounded learning flow. Today and Explore are functional in the current MVP. Review, Library and Profile may appear only as clearly disabled future destinations until those product areas exist. The Immersion itself keeps one dominant next action and does not show persistent primary navigation.
 
 ## Motion
 

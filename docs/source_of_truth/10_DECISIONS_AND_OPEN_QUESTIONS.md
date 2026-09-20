@@ -57,11 +57,18 @@ Updated: 2026-09-20
 - Current browser-local persistence is temporary.
 
 ### Design
+- Official logo direction: The Opening.
+- Official illustration principle: Reveal the mechanism.
+- Production visuals use reusable vector/component assets.
+- Impeccable is the UI craft/critique workflow.
+- VoltAgent/awesome-design-md is a reference source, not a template to copy.
 - Large readable type.
 - Stronger Curio color system.
 - Illustrations support mechanisms.
 - No generic AI gradients, glassmorphism or dashboard aesthetic.
 - One clear next action.
+- Bottom navigation is used on discovery surfaces for orientation, but stays out of the active Immersion so the learning flow keeps one dominant next action.
+- Navigation destinations that are not implemented must be visibly disabled rather than behaving like fake controls.
 
 ## Superseded decisions
 

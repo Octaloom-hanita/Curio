@@ -22,7 +22,14 @@ import {
 import { AppText, AppTextScaleProvider } from './src/AppText';
 import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
-import { CurioIcon, CurioScene, type SceneName } from './src/Visuals';
+import { CurioMark } from './src/BrandSystem';
+import { CurioIcon, CurioIconBadge, type IconName } from './src/IconSystem';
+import {
+  CurioScene,
+  CurioTopicVisual,
+  type SceneName,
+  type TopicVisualName,
+} from './src/Visuals';
 import { topics as fallbackTopics, type Topic } from './src/topics';
 import { loadApprovedCatalog, loadApprovedImmersionSteps, type LessonStep } from './src/contentRepository';
 
@@ -37,15 +44,26 @@ const accentMap: Record<Accent, string> = {
   yellow: colors.yellow,
 };
 
+const topicVisualByIcon: Partial<Record<IconName, TopicVisualName>> = {
+  earth: 'earth',
+  leaf: 'life',
+  brain: 'brain',
+  bulb: 'cognition',
+  network: 'society',
+  body: 'body',
+  technology: 'technology',
+  microscope: 'science',
+};
+
 const sceneMap: SceneName[] = [
-  'flow',
-  'flow',
-  'heat',
-  'flow',
-  'flow',
+  'airflow',
+  'airflow',
+  'temperature',
+  'structure',
+  'decentralized',
   'cycle',
   'cycle',
-  'flow',
+  'airflow',
   'recall',
   'connection',
   'complete',
@@ -160,6 +178,72 @@ function PrimaryButton({
   );
 }
 
+function BottomNavigation({
+  locale,
+  screen,
+  onHome,
+  onExplore,
+}: {
+  locale: Locale;
+  screen: Screen;
+  onHome: () => void;
+  onExplore: () => void;
+}) {
+  const active = screen === 'home' ? 'today' : 'explore';
+  const items: {
+    key: 'today' | 'explore' | 'review' | 'library' | 'profile';
+    icon: IconName;
+    ru: string;
+    en: string;
+    enabled: boolean;
+    onPress?: () => void;
+    accent: string;
+  }[] = [
+    { key: 'today', icon: 'today', ru: 'Сегодня', en: 'Today', enabled: true, onPress: onHome, accent: colors.orange },
+    { key: 'explore', icon: 'explore', ru: 'Исследовать', en: 'Explore', enabled: true, onPress: onExplore, accent: colors.green },
+    { key: 'review', icon: 'review', ru: 'Повторить', en: 'Review', enabled: false, accent: colors.purple },
+    { key: 'library', icon: 'library', ru: 'Библиотека', en: 'Library', enabled: false, accent: colors.blue },
+    { key: 'profile', icon: 'profile', ru: 'Профиль', en: 'Profile', enabled: false, accent: colors.yellow },
+  ];
+
+  return (
+    <View style={styles.bottomNavWrap}>
+      <View style={styles.bottomNav}>
+        {items.map((item) => {
+          const selected = active === item.key;
+          return (
+            <Pressable
+              key={item.key}
+              accessibilityRole="button"
+              accessibilityState={{ selected, disabled: !item.enabled }}
+              accessibilityLabel={locale === 'ru' ? item.ru : item.en}
+              disabled={!item.enabled}
+              onPress={item.onPress}
+              style={({ pressed }) => [
+                styles.bottomNavItem,
+                selected && styles.bottomNavItemActive,
+                !item.enabled && styles.bottomNavItemDisabled,
+                pressed && item.enabled && { opacity: 0.76 },
+              ]}
+            >
+              <CurioIcon
+                name={item.icon}
+                size={28}
+                color={colors.ink}
+                accent={item.accent}
+              />
+              <AppText variant="meta">
+                {locale === 'ru' ? item.ru : item.en}
+              </AppText>
+              {selected && <View style={styles.bottomNavIndicator} />}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 function Topbar({
   locale,
   textScale,
@@ -185,7 +269,7 @@ function Topbar({
         onPress={onHome}
         style={styles.brand}
       >
-        <View style={styles.brandDot} />
+        <CurioMark size={30} />
         <AppText variant="title">Curio</AppText>
       </Pressable>
 
@@ -212,6 +296,7 @@ function TopicCard({
 }) {
   const copy = topic[locale];
   const uiCopy = ui[locale];
+  const visualName = topicVisualByIcon[topic.icon];
 
   return (
     <Pressable
@@ -222,13 +307,19 @@ function TopicCard({
         pressed && { opacity: 0.82 },
       ]}
     >
-      <View
-        style={[
-          styles.topicIcon,
-          { backgroundColor: accentMap[topic.color] },
-        ]}
-      >
-        <CurioIcon name={topic.icon} size={44} fill={colors.surface} />
+      <View style={styles.topicVisual}>
+        {visualName ? (
+          <CurioTopicVisual name={visualName} size={88} />
+        ) : (
+          <CurioIconBadge
+            name={topic.icon}
+            size={72}
+            iconSize={38}
+            background={accentMap[topic.color]}
+            color={colors.surface}
+            accent={colors.surface}
+          />
+        )}
       </View>
 
       <View style={styles.topicCopy}>
@@ -308,8 +399,17 @@ function HomeScreen({
       )}
 
       <View style={styles.honestyNote}>
-        <CurioIcon name="bulb" size={42} fill={colors.yellow} />
-        <AppText variant="bodySmall">{copy.onlyOneReady}</AppText>
+        <CurioIconBadge
+          name="bulb"
+          size={54}
+          iconSize={32}
+          background={colors.yellow}
+          color={colors.ink}
+          accent={colors.orange}
+        />
+        <View style={styles.honestyCopy}>
+          <AppText variant="bodySmall">{copy.onlyOneReady}</AppText>
+        </View>
       </View>
 
       <View style={styles.topicList}>
@@ -341,6 +441,7 @@ function CategoryScreen({
 }) {
   const copy = topic[locale];
   const questions = topic.questions ?? [];
+  const visualName = topicVisualByIcon[topic.icon];
 
   return (
     <>
@@ -350,19 +451,25 @@ function CategoryScreen({
           onPress={onBack}
           style={styles.backButton}
         >
-          <AppText variant="title">‹</AppText>
+          <CurioIcon name="back" size={24} color={colors.ink} />
           <AppText variant="meta">{locale === 'ru' ? 'Назад' : 'Back'}</AppText>
         </Pressable>
       </View>
 
       <View style={styles.categoryHero}>
-        <View
-          style={[
-            styles.topicIcon,
-            { backgroundColor: accentMap[topic.color] },
-          ]}
-        >
-          <CurioIcon name={topic.icon} size={44} fill={colors.surface} />
+        <View style={styles.categoryVisual}>
+          {visualName ? (
+            <CurioTopicVisual name={visualName} size={104} />
+          ) : (
+            <CurioIconBadge
+              name={topic.icon}
+              size={84}
+              iconSize={42}
+              background={accentMap[topic.color]}
+              color={colors.surface}
+              accent={colors.surface}
+            />
+          )}
         </View>
         <View style={styles.categoryHeroCopy}>
           <AppText variant="display" serif>
@@ -422,7 +529,7 @@ function CategoryScreen({
 
         {questions.length === 0 && (
           <View style={styles.honestyNote}>
-            <CurioIcon name="bulb" size={42} fill={colors.yellow} />
+            <CurioIcon name="bulb" size={42} color={colors.ink} accent={colors.yellow} />
             <AppText variant="bodySmall">
               {locale === 'ru'
                 ? 'Карта вопросов для этой области загружается.'
@@ -457,7 +564,7 @@ function LessonProgress({
         onPress={onBack}
         style={styles.backButton}
       >
-        <AppText variant="title">‹</AppText>
+        <CurioIcon name="back" size={24} color={colors.ink} />
         <AppText variant="meta">{copy.back}</AppText>
       </Pressable>
 
@@ -589,7 +696,7 @@ export default function App() {
   const kind = step?.kind ?? 'learn';
   const cta = step?.cta;
   const totalSteps = lessonSteps.length > 0 ? lessonSteps.length : copy.steps.length;
-  const scene = sceneMap[index] ?? 'flow';
+  const scene = sceneMap[index] ?? 'airflow';
   const accent = accentByStep[index] ?? 'green';
   const summaryIndex = lessonSteps.length > 0
     ? Math.max(0, lessonSteps.findIndex((item) => item.kind === 'summary'))
@@ -608,6 +715,15 @@ export default function App() {
     setScreen('home');
     setSelectedTopic(null);
     resetEvaluation();
+  };
+
+  const goExplore = () => {
+    resetEvaluation();
+    if (selectedTopic) {
+      setScreen('category');
+      return;
+    }
+    setScreen('home');
   };
 
   const loadLesson = async (immersionId: string) => {
@@ -896,10 +1012,16 @@ export default function App() {
 
                 {[1, 2, 3, 4, 5, 9].includes(index) && (
                   <View style={styles.sceneBlock}>
-                    <CurioScene name={scene} />
+                    <View style={styles.sceneSurface}>
+                      <CurioScene name={scene} />
+                    </View>
                     <AppText variant="meta" color="muted" style={styles.sceneCaption}>
-                      {scene === 'heat'
+                      {scene === 'temperature'
                         ? copy.sceneHeat
+                        : scene === 'structure'
+                        ? copy.sceneStructure
+                        : scene === 'decentralized'
+                        ? copy.sceneDecentralized
                         : scene === 'cycle'
                         ? copy.sceneCycle
                         : scene === 'connection'
@@ -944,7 +1066,7 @@ export default function App() {
                 {kind === 'recall' && (
                   <>
                     <View style={styles.recallHint}>
-                      <CurioIcon name="bulb" size={40} fill={colors.yellow} />
+                      <CurioIcon name="bulb" size={40} color={colors.ink} accent={colors.yellow} />
                       <AppText variant="bodySmall">{copy.ideaNotTerms}</AppText>
                     </View>
 
@@ -1030,7 +1152,7 @@ export default function App() {
 
                     {evaluationError && (
                       <View style={styles.errorPanel}>
-                        <CurioIcon name="bulb" size={42} fill={colors.yellow} />
+                        <CurioIcon name="bulb" size={42} color={colors.ink} accent={colors.yellow} />
                         <AppText variant="bodySmall">{evaluationError}</AppText>
                       </View>
                     )}
@@ -1045,7 +1167,8 @@ export default function App() {
                                 : 'network'
                             }
                             size={48}
-                            fill={
+                            color={colors.ink}
+                            accent={
                               evaluation.status === 'understood'
                                 ? colors.green
                                 : colors.purple
@@ -1188,6 +1311,14 @@ export default function App() {
             )}
           </View>
         </ScrollView>
+        {screen !== 'lesson' && (
+          <BottomNavigation
+            locale={locale}
+            screen={screen}
+            onHome={goHome}
+            onExplore={goExplore}
+          />
+        )}
       </SafeAreaView>
     </AppTextScaleProvider>
   );
@@ -1207,12 +1338,57 @@ const styles = StyleSheet.create({
   page: {
     minHeight: '100%',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: 132,
   },
   shell: {
     width: '100%',
     maxWidth: 760,
     alignSelf: 'center',
+  },
+  bottomNavWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.base,
+    backgroundColor: colors.canvas,
+  },
+  bottomNav: {
+    width: '100%',
+    maxWidth: 760,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.hairline,
+    borderRadius: 24,
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
+    paddingBottom: 6,
+  },
+  bottomNavItem: {
+    flex: 1,
+    minHeight: 66,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    borderRadius: 16,
+    position: 'relative',
+  },
+  bottomNavItemActive: {
+    backgroundColor: '#FFF8F3',
+  },
+  bottomNavItemDisabled: {
+    opacity: 0.38,
+  },
+  bottomNavIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    width: 34,
+    height: 4,
+    borderRadius: radius.pill,
+    backgroundColor: colors.orange,
   },
   topbar: {
     flexDirection: 'row',
@@ -1227,14 +1403,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     alignItems: 'center',
     minHeight: 52,
-  },
-  brandDot: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.orange,
-    borderWidth: 2,
-    borderColor: colors.ink,
   },
   topbarActions: {
     flexDirection: 'row',
@@ -1297,8 +1465,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingVertical: spacing.base,
+    padding: spacing.base,
     marginBottom: spacing.lg,
+    backgroundColor: colors.warningSoft,
+    borderRadius: radius.surface,
+    borderWidth: 1.5,
+    borderColor: colors.hairline,
+  },
+  honestyCopy: {
+    flex: 1,
   },
   topicList: {
     gap: spacing.base,
@@ -1313,12 +1488,16 @@ const styles = StyleSheet.create({
     borderColor: colors.ink,
     borderRadius: radius.surface,
   },
-  topicIcon: {
-    width: 68,
-    height: 68,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: colors.ink,
+  topicVisual: {
+    width: 88,
+    height: 88,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  categoryVisual: {
+    width: 108,
+    height: 108,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -1421,11 +1600,19 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   sceneBlock: {
-    marginBottom: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  sceneSurface: {
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.hairline,
+    borderRadius: 28,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.base,
   },
   sceneCaption: {
     textAlign: 'center',
-    marginTop: -8,
+    marginTop: spacing.sm,
   },
   eyebrowRow: {
     flexDirection: 'row',

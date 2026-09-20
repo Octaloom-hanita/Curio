@@ -1,4 +1,4 @@
-import type { IconName } from './Visuals';
+import type { IconName } from './IconSystem';
 import type { Topic } from './topics';
 
 const SUPABASE_URL = 'https://quxhnwpbrkiisrseaexs.supabase.co';
@@ -68,13 +68,13 @@ export type LessonStep = {
 };
 
 const presentationByArea: Record<string, { icon: IconName; color: Accent }> = {
-  area_earth: { icon: 'atom', color: 'blue' },
+  area_earth: { icon: 'earth', color: 'blue' },
   area_life: { icon: 'leaf', color: 'green' },
   area_brain: { icon: 'brain', color: 'purple' },
   area_cognition: { icon: 'bulb', color: 'yellow' },
   area_society: { icon: 'network', color: 'orange' },
-  area_body: { icon: 'atom', color: 'orange' },
-  area_technology: { icon: 'atom', color: 'blue' },
+  area_body: { icon: 'body', color: 'orange' },
+  area_technology: { icon: 'technology', color: 'blue' },
   area_science: { icon: 'microscope', color: 'purple' },
 };
 

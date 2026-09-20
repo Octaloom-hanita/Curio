@@ -1,4 +1,4 @@
-import type { IconName } from './Visuals';
+import type { IconName } from './IconSystem';
 
 export type TopicId = string;
 
