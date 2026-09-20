@@ -90,9 +90,9 @@ export async function loadApprovedTopics(): Promise<Topic[]> {
 
     return topicRows.map((row) => {
       const firstImmersion = firstImmersionByTopic.get(row.id);
-      const presentation =
-        (row.category_id && presentationByArea[row.category_id]) ??
-        fallbackPresentation;
+      const presentation = row.category_id
+        ? presentationByArea[row.category_id] ?? fallbackPresentation
+        : fallbackPresentation;
 
       return {
         id: row.id,
