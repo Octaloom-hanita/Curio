@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -19,7 +19,7 @@ import {
   useFonts as useLiterataFonts,
   Literata_600SemiBold,
 } from '@expo-google-fonts/literata';
-import { AppText } from './src/AppText';
+import { AppText, AppTextScaleProvider } from './src/AppText';
 import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
 import { CurioIcon, CurioScene, type SceneName } from './src/Visuals';
@@ -36,18 +36,53 @@ const accentMap: Record<Accent, string> = {
   yellow: colors.yellow,
 };
 
-const stepAccent: Accent[] = ['orange','purple','orange','green','blue','purple','orange','purple','green'];
-const stepScene: SceneName[] = ['mound','mound','mound','heat','cycle','recall','recall','connection','complete'];
+const sceneMap: SceneName[] = [
+  'flow',
+  'flow',
+  'heat',
+  'flow',
+  'flow',
+  'cycle',
+  'cycle',
+  'flow',
+  'recall',
+  'connection',
+  'complete',
+];
 
-function LanguageSwitch({ locale, onChange }: { locale: Locale; onChange: (locale: Locale) => void }) {
+const accentByStep: Accent[] = [
+  'orange',
+  'green',
+  'orange',
+  'blue',
+  'purple',
+  'blue',
+  'green',
+  'orange',
+  'purple',
+  'purple',
+  'green',
+];
+
+function LanguageSwitch({
+  locale,
+  onChange,
+}: {
+  locale: Locale;
+  onChange: (locale: Locale) => void;
+}) {
   return (
-    <View style={styles.languageWrap}>
+    <View style={styles.segmented}>
       {(['ru', 'en'] as Locale[]).map((item) => (
         <Pressable
           key={item}
           accessibilityRole="button"
+          accessibilityState={{ selected: locale === item }}
           onPress={() => onChange(item)}
-          style={[styles.languageButton, locale === item && styles.languageButtonActive]}
+          style={[
+            styles.segmentedButton,
+            locale === item && styles.segmentedButtonActive,
+          ]}
         >
           <AppText variant="label">{item.toUpperCase()}</AppText>
         </Pressable>
@@ -56,25 +91,67 @@ function LanguageSwitch({ locale, onChange }: { locale: Locale; onChange: (local
   );
 }
 
-function Button({
+function TextSizeControl({
+  locale,
+  scale,
+  onChange,
+}: {
+  locale: Locale;
+  scale: number;
+  onChange: (scale: number) => void;
+}) {
+  const copy = ui[locale];
+  return (
+    <View
+      accessibilityLabel={copy.textSize}
+      style={styles.textSizeControl}
+    >
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={copy.smaller}
+        disabled={scale <= 1}
+        onPress={() => onChange(1)}
+        style={[styles.textSizeButton, scale <= 1 && styles.controlDisabled]}
+      >
+        <AppText variant="label">A</AppText>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={copy.larger}
+        disabled={scale >= 1.16}
+        onPress={() => onChange(1.16)}
+        style={[styles.textSizeButton, scale >= 1.16 && styles.controlDisabled]}
+      >
+        <AppText variant="title">A</AppText>
+      </Pressable>
+    </View>
+  );
+}
+
+function PrimaryButton({
   label,
   onPress,
-  accent = 'orange',
+  accent = 'green',
   secondary = false,
+  disabled = false,
 }: {
   label: string;
   onPress: () => void;
   accent?: Accent;
   secondary?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       accessibilityRole="button"
+      disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        secondary ? styles.secondaryButton : { backgroundColor: accentMap[accent] },
-        { opacity: pressed ? 0.82 : 1 },
+        secondary
+          ? styles.secondaryButton
+          : { backgroundColor: accentMap[accent] },
+        (pressed || disabled) && { opacity: disabled ? 0.45 : 0.82 },
       ]}
     >
       <AppText variant="label">{label}</AppText>
@@ -82,141 +159,220 @@ function Button({
   );
 }
 
-function Topbar({ locale, onLocale, onHome, showHome }: {
+function Topbar({
+  locale,
+  textScale,
+  onLocale,
+  onTextScale,
+  onHome,
+  inLesson,
+}: {
   locale: Locale;
+  textScale: number;
   onLocale: (locale: Locale) => void;
+  onTextScale: (scale: number) => void;
   onHome: () => void;
-  showHome: boolean;
+  inLesson: boolean;
 }) {
+  const copy = ui[locale];
+
   return (
     <View style={styles.topbar}>
-      <Pressable onPress={onHome} style={styles.brand}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={inLesson ? copy.topics : 'Curio'}
+        onPress={onHome}
+        style={styles.brand}
+      >
         <View style={styles.brandDot} />
         <AppText variant="title">Curio</AppText>
       </Pressable>
+
       <View style={styles.topbarActions}>
-        {showHome && (
-          <Pressable onPress={onHome} style={styles.topbarButton}>
-            <AppText variant="label">{locale === 'ru' ? 'Темы' : 'Topics'}</AppText>
-          </Pressable>
-        )}
+        <TextSizeControl
+          locale={locale}
+          scale={textScale}
+          onChange={onTextScale}
+        />
         <LanguageSwitch locale={locale} onChange={onLocale} />
       </View>
     </View>
   );
 }
 
-function TopicCard({ topic, locale, onPress }: { topic: Topic; locale: Locale; onPress: () => void }) {
+function TopicCard({
+  topic,
+  locale,
+  onPress,
+}: {
+  topic: Topic;
+  locale: Locale;
+  onPress: () => void;
+}) {
   const copy = topic[locale];
-  const color = accentMap[topic.color];
+  const uiCopy = ui[locale];
+
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.topicCard, { opacity: pressed ? 0.82 : 1 }]}
+      style={({ pressed }) => [
+        styles.topicCard,
+        pressed && { opacity: 0.82 },
+      ]}
     >
-      <View style={[styles.topicIcon, { backgroundColor: color }]}>
-        <CurioIcon name={topic.icon} size={48} fill={colors.surface} />
+      <View
+        style={[
+          styles.topicIcon,
+          { backgroundColor: accentMap[topic.color] },
+        ]}
+      >
+        <CurioIcon name={topic.icon} size={44} fill={colors.surface} />
       </View>
+
       <View style={styles.topicCopy}>
-        <View style={styles.topicTitleRow}>
+        <View style={styles.topicHeader}>
           <AppText variant="title">{copy.title}</AppText>
-          <View style={[styles.statusPill, { backgroundColor: topic.ready ? colors.green : colors.surfaceSoft }]}>
+          <View
+            style={[
+              styles.statusPill,
+              topic.ready ? styles.statusReady : styles.statusSoon,
+            ]}
+          >
             <AppText variant="meta">
-              {topic.ready ? (locale === 'ru' ? 'Доступно' : 'Ready') : (locale === 'ru' ? 'Скоро' : 'Soon')}
+              {topic.ready ? uiCopy.ready : uiCopy.soon}
             </AppText>
           </View>
         </View>
-        <AppText variant="bodySmall" color="muted">{copy.description}</AppText>
-        <AppText variant="label">{copy.first}</AppText>
+
+        <AppText variant="bodySmall" color="muted">
+          {copy.description}
+        </AppText>
+
+        <View style={styles.firstLessonRow}>
+          <AppText variant="label">
+            {locale === 'ru' ? 'Первое исследование:' : 'First exploration:'}
+          </AppText>
+          <AppText variant="bodySmall">{copy.first}</AppText>
+        </View>
       </View>
     </Pressable>
   );
 }
 
-function HomeScreen({ locale, onSelect }: { locale: Locale; onSelect: (topic: Topic) => void }) {
-  const [message, setMessage] = useState<string | null>(null);
+function HomeScreen({
+  locale,
+  onSelect,
+}: {
+  locale: Locale;
+  onSelect: (topic: Topic) => void;
+}) {
+  const copy = ui[locale];
+  const [notice, setNotice] = useState<string | null>(null);
 
-  const choose = (topic: Topic) => {
+  const select = (topic: Topic) => {
     if (topic.ready) {
-      setMessage(null);
+      setNotice(null);
       onSelect(topic);
       return;
     }
-    setMessage(
+
+    setNotice(
       locale === 'ru'
-        ? 'Тема уже есть в каталоге, но первый полноценный разбор ещё не построен.'
-        : 'This topic is already in the catalog, but its first full immersion is not built yet.'
+        ? 'Эта тема уже запланирована, но полноценное исследование ещё не готово.'
+        : 'This topic is planned, but its full exploration is not ready yet.'
     );
   };
 
   return (
     <>
-      <View style={styles.homeHero}>
-        <CurioIcon name="book" size={72} fill={colors.orange} />
-        <View style={styles.homeHeroCopy}>
-          <AppText variant="display" serif>
-            {locale === 'ru' ? 'Что вам интересно сегодня?' : 'What are you curious about today?'}
-          </AppText>
-          <AppText variant="body" color="muted">
-            {locale === 'ru'
-              ? 'Сначала выбираем область. Потом Curio предлагает вопрос или явление для исследования.'
-              : 'Choose a field first. Then Curio suggests a question or phenomenon to explore.'}
-          </AppText>
-        </View>
+      <View style={styles.homeIntro}>
+        <AppText variant="display" serif>
+          {copy.chooseTopicTitle}
+        </AppText>
+        <AppText variant="body" color="muted">
+          {copy.chooseTopicBody}
+        </AppText>
       </View>
 
-      <View style={styles.topicGrid}>
+      <View style={styles.honestyNote}>
+        <CurioIcon name="bulb" size={42} fill={colors.yellow} />
+        <AppText variant="bodySmall">{copy.onlyOneReady}</AppText>
+      </View>
+
+      <View style={styles.topicList}>
         {topics.map((topic) => (
-          <TopicCard key={topic.id} topic={topic} locale={locale} onPress={() => choose(topic)} />
+          <TopicCard
+            key={topic.id}
+            topic={topic}
+            locale={locale}
+            onPress={() => select(topic)}
+          />
         ))}
       </View>
 
-      {message && (
+      {notice && (
         <View style={styles.catalogNotice}>
-          <CurioIcon name="bulb" size={44} fill={colors.yellow} />
-          <AppText variant="bodySmall">{message}</AppText>
+          <AppText variant="bodySmall">{notice}</AppText>
         </View>
       )}
     </>
   );
 }
 
-function Progress({ current, total, onBack, locale }: { current: number; total: number; onBack: () => void; locale: Locale }) {
+function LessonProgress({
+  index,
+  total,
+  locale,
+  onBack,
+}: {
+  index: number;
+  total: number;
+  locale: Locale;
+  onBack: () => void;
+}) {
+  const copy = ui[locale];
+  const current = index + 1;
+
   return (
     <View style={styles.progressRow}>
-      <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={copy.back}
+        onPress={onBack}
+        style={styles.backButton}
+      >
         <AppText variant="title">‹</AppText>
+        <AppText variant="meta">{copy.back}</AppText>
       </Pressable>
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${Math.max(8, (current / total) * 100)}%` }]} />
-      </View>
-      <AppText variant="meta" color="muted">{current} {locale === 'ru' ? 'из' : 'of'} {total}</AppText>
-    </View>
-  );
-}
 
-function AudioDock({ locale }: { locale: Locale }) {
-  const [playing, setPlaying] = useState(false);
-  return (
-    <View style={styles.audioDock}>
-      <View style={styles.iconBubble}>
-        <CurioIcon name="audio" size={40} fill={colors.green} />
+      <View style={styles.progressInfo}>
+        <View style={styles.progressTrack}>
+          <View
+            style={[
+              styles.progressFill,
+              { width: `${Math.max(8, (current / total) * 100)}%` },
+            ]}
+          />
+        </View>
+        <AppText variant="meta" color="muted">
+          {current} {locale === 'ru' ? 'из' : 'of'} {total}
+        </AppText>
       </View>
-      <View style={styles.audioText}>
-        <AppText variant="label">{locale === 'ru' ? 'Аудио' : 'Audio'}</AppText>
-        <AppText variant="meta" color="muted">00:00 / 02:10 · 1x</AppText>
-      </View>
-      <Pressable onPress={() => setPlaying((value) => !value)} style={styles.playButton}>
-        <AppText variant="title">{playing ? 'Ⅱ' : '▶'}</AppText>
-      </Pressable>
     </View>
   );
 }
 
 export default function App() {
-  const [golosLoaded] = useGolosFonts({ GolosText_400Regular, GolosText_600SemiBold, GolosText_700Bold });
+  const [golosLoaded] = useGolosFonts({
+    GolosText_400Regular,
+    GolosText_600SemiBold,
+    GolosText_700Bold,
+  });
   const [literataLoaded] = useLiterataFonts({ Literata_600SemiBold });
+
   const [locale, setLocale] = useState<Locale>('ru');
+  const [textScale, setTextScale] = useState(1);
   const [screen, setScreen] = useState<Screen>('home');
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState('');
@@ -224,290 +380,658 @@ export default function App() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
 
+  if (!golosLoaded || !literataLoaded) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color={colors.orange} />
+      </View>
+    );
+  }
+
   const copy = ui[locale];
   const step = copy.steps[index];
-  const accent = stepAccent[index] ?? 'orange';
-  const scene = stepScene[index] ?? 'mound';
-  const kind = step?.kind ?? 'intro';
-  const headingVariant = useMemo(() => (index === 0 ? 'display' : 'headline') as const, [index]);
+  const kind = step.kind;
+  const scene = sceneMap[index] ?? 'flow';
+  const accent = accentByStep[index] ?? 'green';
+  const summaryIndex = 6;
+  const connectionIndex = 9;
 
-  if (!golosLoaded || !literataLoaded) {
-    return <View style={styles.loading}><ActivityIndicator size="large" color={colors.orange} /></View>;
-  }
+  const resetEvaluation = () => {
+    setEvaluation(null);
+    setEvaluationError(null);
+    setIsEvaluating(false);
+  };
 
   const goHome = () => {
     setScreen('home');
     setIndex(0);
     setAnswer('');
-    setEvaluation(null);
-    setEvaluationError(null);
+    resetEvaluation();
   };
 
   const startTopic = (_topic: Topic) => {
     setScreen('lesson');
     setIndex(0);
     setAnswer('');
+    resetEvaluation();
+  };
+
+  const goBack = () => {
+    resetEvaluation();
+    if (index === 0) {
+      goHome();
+      return;
+    }
+    setIndex((value) => Math.max(0, value - 1));
+  };
+
+  const goNext = () => {
+    resetEvaluation();
+    setIndex((value) => Math.min(copy.steps.length - 1, value + 1));
+  };
+
+  const continueAfterEvaluation = () => {
+    resetEvaluation();
+    setIndex(connectionIndex);
+  };
+
+  const retryAnswer = () => {
     setEvaluation(null);
     setEvaluationError(null);
   };
 
-  const next = async () => {
-    if (kind === 'recall') {
-      if (!answer.trim()) {
-        setEvaluationError(
-          locale === 'ru'
-            ? 'Сначала напишите короткий ответ своими словами.'
-            : 'First write a short answer in your own words.'
-        );
-        return;
-      }
+  const reviewExplanation = () => {
+    resetEvaluation();
+    setIndex(summaryIndex);
+  };
 
-      setIsEvaluating(true);
-      setEvaluation(null);
-      setEvaluationError(null);
+  const evaluateAnswer = async () => {
+    const clean = answer.trim();
 
-      try {
-        const response = await fetch('/api/evaluate-answer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answerText: answer, locale }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data?.error || 'EVALUATION_FAILED');
-        }
-
-        setEvaluation(data);
-      } catch (error) {
-        setEvaluationError(
-          locale === 'ru'
-            ? 'Не удалось проверить ответ. Попробуйте ещё раз.'
-            : 'Could not evaluate the answer. Please try again.'
-        );
-      } finally {
-        setIsEvaluating(false);
-      }
-
+    if (clean.length < 8) {
+      setEvaluationError(copy.emptyAnswer);
       return;
     }
 
-    setIndex((value) => Math.min(value + 1, copy.steps.length - 1));
-  };
-
-  const skipFeedback = () => {
+    setIsEvaluating(true);
     setEvaluation(null);
     setEvaluationError(null);
-    setIndex((value) => Math.min(value + 2, copy.steps.length - 1));
+
+    try {
+      const response = await fetch('/api/evaluate-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answerText: clean, locale }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'EVALUATION_FAILED');
+      }
+
+      setEvaluation(data);
+    } catch {
+      setEvaluationError(copy.checkFailed);
+    } finally {
+      setIsEvaluating(false);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-        <View style={styles.shell}>
-          <Topbar locale={locale} onLocale={setLocale} onHome={goHome} showHome={screen === 'lesson'} />
+    <AppTextScaleProvider scale={textScale}>
+      <SafeAreaView style={styles.safe}>
+        <StatusBar style="dark" />
+        <ScrollView
+          contentContainerStyle={styles.page}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.shell}>
+            <Topbar
+              locale={locale}
+              textScale={textScale}
+              onLocale={setLocale}
+              onTextScale={setTextScale}
+              onHome={goHome}
+              inLesson={screen === 'lesson'}
+            />
 
-          {screen === 'home' ? (
-            <HomeScreen locale={locale} onSelect={startTopic} />
-          ) : (
-            <>
-              {index > 0 && <Progress current={index} total={copy.steps.length - 1} onBack={() => setIndex((v) => Math.max(v - 1, 0))} locale={locale} />}
-
-              <CurioScene name={scene} />
-
-              <View style={styles.eyebrowRow}>
-                <View style={[styles.miniMark, { backgroundColor: accentMap[accent] }]} />
-                <AppText variant="label">{step.eyebrow}</AppText>
-              </View>
-
-              <AppText variant={headingVariant} serif={index === 0} style={styles.heading}>
-                {step.title}
-              </AppText>
-
-              <View style={styles.bodyStack}>
-                {step.body.map((paragraph, i) => <AppText key={i} variant="body">{paragraph}</AppText>)}
-              </View>
-
-              {kind === 'hypothesis' && (
-                <TextInput
-                  multiline
-                  placeholder={copy.hypothesisPlaceholder}
-                  placeholderTextColor={colors.muted}
-                  style={styles.input}
+            {screen === 'home' ? (
+              <HomeScreen locale={locale} onSelect={startTopic} />
+            ) : (
+              <>
+                <LessonProgress
+                  index={index}
+                  total={copy.steps.length}
+                  locale={locale}
+                  onBack={goBack}
                 />
-              )}
 
-              {kind === 'note' && (
-                <View style={styles.note}>
-                  <CurioIcon name="microscope" size={52} fill={colors.orange} />
-                  <View style={styles.noteCopy}>
-                    <AppText variant="label">{copy.important}</AppText>
-                    <AppText variant="bodySmall">{copy.scienceNote}</AppText>
-                  </View>
-                </View>
-              )}
+                <CurioScene name={scene} />
 
-              {(kind === 'learn' || kind === 'note') && <AudioDock locale={locale} />}
-
-              {kind === 'recall' && (
-                <>
-                  <View style={styles.voicePanel}>
-                    <CurioIcon name="brain" size={58} fill={colors.purple} />
-                    <View style={styles.voiceText}>
-                      <AppText variant="title">{copy.voiceAnswer}</AppText>
-                      <AppText variant="bodySmall" color="muted">{copy.voiceComing}</AppText>
-                    </View>
-                  </View>
-                  <TextInput
-                    multiline
-                    value={answer}
-                    onChangeText={(value) => {
-                      setAnswer(value);
-                      setEvaluation(null);
-                      setEvaluationError(null);
-                    }}
-                    placeholder={copy.writeInstead}
-                    placeholderTextColor={colors.muted}
-                    style={styles.input}
+                <View style={styles.eyebrowRow}>
+                  <View
+                    style={[
+                      styles.miniMark,
+                      { backgroundColor: accentMap[accent] },
+                    ]}
                   />
+                  <AppText variant="label">{step.eyebrow}</AppText>
+                </View>
 
-                  {isEvaluating && (
-                    <View style={styles.aiNotice}>
-                      <ActivityIndicator size="large" color={colors.purple} />
-                      <View style={styles.noteCopy}>
-                        <AppText variant="label">
-                          {locale === 'ru' ? 'Проверяю понимание...' : 'Checking your understanding...'}
-                        </AppText>
-                        <AppText variant="bodySmall" color="muted">
-                          {locale === 'ru'
-                            ? 'Gemini сравнивает ответ с ключевыми идеями урока.'
-                            : 'Gemini is comparing your answer with the lesson rubric.'}
-                        </AppText>
-                      </View>
+                <AppText
+                  variant={index === 0 ? 'display' : 'headline'}
+                  serif={index === 0}
+                  style={styles.heading}
+                >
+                  {step.title}
+                </AppText>
+
+                <View
+                  style={[
+                    styles.bodyStack,
+                    kind === 'summary' && styles.summaryBox,
+                    kind === 'note' && styles.noteBox,
+                  ]}
+                >
+                  {step.body.map((paragraph, paragraphIndex) => (
+                    <AppText key={paragraphIndex} variant="body">
+                      {paragraph}
+                    </AppText>
+                  ))}
+                </View>
+
+                {kind === 'recall' && (
+                  <>
+                    <View style={styles.recallHint}>
+                      <CurioIcon name="bulb" size={40} fill={colors.yellow} />
+                      <AppText variant="bodySmall">{copy.ideaNotTerms}</AppText>
                     </View>
-                  )}
 
-                  {evaluationError && (
-                    <View style={styles.aiNotice}>
-                      <CurioIcon name="bulb" size={48} fill={colors.yellow} />
-                      <View style={styles.noteCopy}>
-                        <AppText variant="label">
-                          {locale === 'ru' ? 'Нужна ещё одна попытка' : 'One more try'}
-                        </AppText>
+                    <TextInput
+                      accessibilityLabel={copy.answerPlaceholder}
+                      multiline
+                      value={answer}
+                      onChangeText={(value) => {
+                        setAnswer(value);
+                        setEvaluation(null);
+                        setEvaluationError(null);
+                      }}
+                      placeholder={copy.answerPlaceholder}
+                      placeholderTextColor={colors.muted}
+                      style={[
+                        styles.input,
+                        {
+                          fontSize: Math.round(22 * textScale),
+                          lineHeight: Math.round(33 * textScale),
+                        },
+                      ]}
+                    />
+
+                    {isEvaluating && (
+                      <View style={styles.aiPanel}>
+                        <ActivityIndicator size="large" color={colors.purple} />
+                        <AppText variant="bodySmall">{copy.checking}</AppText>
+                      </View>
+                    )}
+
+                    {evaluationError && (
+                      <View style={styles.errorPanel}>
+                        <CurioIcon name="bulb" size={42} fill={colors.yellow} />
                         <AppText variant="bodySmall">{evaluationError}</AppText>
                       </View>
-                    </View>
-                  )}
+                    )}
 
-                  {evaluation && (
-                    <View style={styles.aiResult}>
-                      <CurioIcon
-                        name={evaluation.status === 'understood' ? 'bulb' : 'network'}
-                        size={52}
-                        fill={evaluation.status === 'understood' ? colors.green : colors.purple}
-                      />
-                      <View style={styles.noteCopy}>
-                        <AppText variant="title">{evaluation.feedback.title}</AppText>
-                        <AppText variant="bodySmall">{evaluation.feedback.summary}</AppText>
+                    {evaluation && (
+                      <View style={styles.feedbackPanel}>
+                        <View style={styles.feedbackHeader}>
+                          <CurioIcon
+                            name={
+                              evaluation.status === 'understood'
+                                ? 'bulb'
+                                : 'network'
+                            }
+                            size={48}
+                            fill={
+                              evaluation.status === 'understood'
+                                ? colors.green
+                                : colors.purple
+                            }
+                          />
+                          <View style={styles.feedbackTitle}>
+                            <AppText variant="title">
+                              {evaluation.feedback.title}
+                            </AppText>
+                            <AppText variant="bodySmall">
+                              {evaluation.feedback.summary}
+                            </AppText>
+                          </View>
+                        </View>
 
                         {evaluation.feedback.strengths?.length > 0 && (
-                          <View style={styles.feedbackList}>
+                          <View style={styles.feedbackSection}>
                             <AppText variant="label">
-                              {locale === 'ru' ? 'Что уже есть в ответе' : 'What is already in your answer'}
+                              {locale === 'ru'
+                                ? 'Что уже понятно'
+                                : 'What is already clear'}
                             </AppText>
-                            {evaluation.feedback.strengths.map((item: string, i: number) => (
-                              <AppText key={i} variant="bodySmall">• {item}</AppText>
-                            ))}
+                            {evaluation.feedback.strengths.map(
+                              (item: string, itemIndex: number) => (
+                                <AppText key={itemIndex} variant="bodySmall">
+                                  • {item}
+                                </AppText>
+                              )
+                            )}
                           </View>
                         )}
 
                         {evaluation.feedback.next?.length > 0 && (
-                          <View style={styles.feedbackList}>
+                          <View style={styles.feedbackSection}>
                             <AppText variant="label">
-                              {locale === 'ru' ? 'Что стоит добавить' : 'What to add'}
+                              {locale === 'ru'
+                                ? 'Что добавить'
+                                : 'What to add'}
                             </AppText>
-                            {evaluation.feedback.next.map((item: string, i: number) => (
-                              <AppText key={i} variant="bodySmall">• {item}</AppText>
-                            ))}
+                            {evaluation.feedback.next.map(
+                              (item: string, itemIndex: number) => (
+                                <AppText key={itemIndex} variant="bodySmall">
+                                  • {item}
+                                </AppText>
+                              )
+                            )}
                           </View>
                         )}
 
-                        <Button
-                          label={locale === 'ru' ? 'Продолжить' : 'Continue'}
-                          onPress={skipFeedback}
-                          accent={evaluation.status === 'understood' ? 'green' : 'purple'}
-                        />
+                        <View style={styles.feedbackActions}>
+                          {evaluation.status === 'understood' ? (
+                            <PrimaryButton
+                              label={copy.continue}
+                              onPress={continueAfterEvaluation}
+                              accent="green"
+                            />
+                          ) : (
+                            <>
+                              <PrimaryButton
+                                label={copy.retry}
+                                onPress={retryAnswer}
+                                accent="purple"
+                              />
+                              <PrimaryButton
+                                label={copy.reviewExplanation}
+                                onPress={reviewExplanation}
+                                secondary
+                              />
+                              <Pressable
+                                accessibilityRole="button"
+                                onPress={continueAfterEvaluation}
+                                style={styles.textAction}
+                              >
+                                <AppText variant="label" color="muted">
+                                  {copy.continueAnyway}
+                                </AppText>
+                              </Pressable>
+                            </>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  )}
-                </>
-              )}
+                    )}
 
-              {step.cta && !evaluation && !isEvaluating && (
-                <View style={styles.actions}>
-                  <Button label={kind === 'recall' ? (locale === 'ru' ? 'Проверить ответ' : 'Check my answer') : step.cta} onPress={next} accent={accent} />
-                  {kind === 'recall' && (
-                    <Button
-                      label={copy.answerLater}
-                      onPress={skipFeedback}
-                      secondary
+                    {!evaluation && !isEvaluating && (
+                      <View style={styles.actions}>
+                        <PrimaryButton
+                          label={copy.checkAnswer}
+                          onPress={evaluateAnswer}
+                          accent="purple"
+                        />
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={continueAfterEvaluation}
+                          style={styles.textAction}
+                        >
+                          <AppText variant="label" color="muted">
+                            {locale === 'ru'
+                              ? 'Продолжить без ответа'
+                              : 'Continue without answering'}
+                          </AppText>
+                        </Pressable>
+                      </View>
+                    )}
+                  </>
+                )}
+
+                {kind !== 'recall' && step.cta && (
+                  <View style={styles.actions}>
+                    <PrimaryButton
+                      label={step.cta}
+                      onPress={goNext}
+                      accent={accent}
                     />
-                  )}
-                </View>
-              )}
-            </>
-          )}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+                  </View>
+                )}
+
+                {kind === 'complete' && (
+                  <View style={styles.actions}>
+                    <PrimaryButton
+                      label={copy.topics}
+                      onPress={goHome}
+                      accent="green"
+                    />
+                  </View>
+                )}
+              </>
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </AppTextScaleProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.canvas },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.canvas },
-  page: { minHeight: '100%', paddingHorizontal: spacing.lg, paddingVertical: spacing.lg },
-  shell: { width: '100%', maxWidth: 820, alignSelf: 'center' },
-  topbar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xl, gap: spacing.md },
-  topbarActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  topbarButton: { minHeight: 48, paddingHorizontal: spacing.base, borderWidth: 2, borderColor: colors.ink, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: colors.surface },
-  brand: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
-  brandDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: colors.orange, borderWidth: 2, borderColor: colors.ink },
-  languageWrap: { flexDirection: 'row', borderWidth: 2, borderColor: colors.ink, borderRadius: radius.pill, backgroundColor: colors.surface, padding: 4 },
-  languageButton: { minWidth: 58, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radius.pill },
-  languageButtonActive: { backgroundColor: colors.yellow },
-  homeHero: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, marginBottom: spacing.xl },
-  homeHeroCopy: { flex: 1, gap: spacing.md },
-  topicGrid: { gap: spacing.base },
-  topicCard: { flexDirection: 'row', gap: spacing.base, alignItems: 'center', padding: spacing.lg, backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.ink, borderRadius: radius.surface },
-  topicIcon: { width: 76, height: 76, borderRadius: 22, borderWidth: 2, borderColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
-  topicCopy: { flex: 1, gap: spacing.sm },
-  topicTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md, flexWrap: 'wrap' },
-  statusPill: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.ink },
-  catalogNotice: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.base, backgroundColor: colors.warningSoft, borderWidth: 2, borderColor: colors.ink, borderRadius: radius.surface },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginBottom: spacing.lg },
-  back: { width: 56, height: 56, borderRadius: radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.ink },
-  progressTrack: { flex: 1, height: 10, backgroundColor: colors.surfaceSoft, borderRadius: radius.pill, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: colors.green, borderRadius: radius.pill },
-  eyebrowRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center', marginTop: spacing.sm },
-  miniMark: { width: 18, height: 18, borderRadius: 6, borderWidth: 2, borderColor: colors.ink, transform: [{ rotate: '-5deg' }] },
-  heading: { marginTop: spacing.md, marginBottom: spacing.lg },
-  bodyStack: { gap: spacing.md },
-  button: { minHeight: 64, borderRadius: radius.control, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg, borderWidth: 2, borderColor: colors.ink },
-  secondaryButton: { backgroundColor: colors.surface },
-  actions: { gap: spacing.md, marginTop: spacing.xl, marginBottom: spacing.xxl },
-  audioDock: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.xl, padding: spacing.base, borderRadius: radius.surface, borderWidth: 2, borderColor: colors.ink, backgroundColor: colors.surface, gap: spacing.md },
-  iconBubble: { width: 58, height: 58, borderRadius: 18, backgroundColor: colors.surfaceSoft, alignItems: 'center', justifyContent: 'center' },
-  audioText: { gap: 2, flex: 1 },
-  playButton: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.green, borderWidth: 2, borderColor: colors.ink },
-  input: { minHeight: 150, marginTop: spacing.lg, padding: spacing.base, borderRadius: radius.surface, borderWidth: 2, borderColor: colors.ink, backgroundColor: colors.surface, fontFamily: 'GolosText_400Regular', fontSize: 21, lineHeight: 31, color: colors.text, textAlignVertical: 'top' },
-  note: { marginTop: spacing.lg, flexDirection: 'row', gap: spacing.base, alignItems: 'center', padding: spacing.lg, borderRadius: radius.surface, backgroundColor: colors.warmNote, borderWidth: 2, borderColor: colors.orange },
-  noteCopy: { flex: 1, gap: spacing.sm },
-  voicePanel: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.base, padding: spacing.lg, borderRadius: radius.surface, backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.purple },
-  voiceText: { flex: 1, gap: spacing.xs },
-  aiNotice: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.base, padding: spacing.lg, backgroundColor: colors.warningSoft, borderWidth: 3, borderColor: colors.purple, borderRadius: radius.surface },
-  aiResult: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.base, padding: spacing.lg, backgroundColor: colors.surface, borderWidth: 3, borderColor: colors.purple, borderRadius: radius.surface },
-  feedbackList: { gap: spacing.xs, marginTop: spacing.sm },
+  safe: {
+    flex: 1,
+    backgroundColor: colors.canvas,
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.canvas,
+  },
+  page: {
+    minHeight: '100%',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+  },
+  shell: {
+    width: '100%',
+    maxWidth: 760,
+    alignSelf: 'center',
+  },
+  topbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  brand: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    alignItems: 'center',
+    minHeight: 52,
+  },
+  brandDot: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.orange,
+    borderWidth: 2,
+    borderColor: colors.ink,
+  },
+  topbarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  segmented: {
+    flexDirection: 'row',
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
+    padding: 4,
+  },
+  segmentedButton: {
+    minWidth: 58,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.pill,
+  },
+  segmentedButtonActive: {
+    backgroundColor: colors.yellow,
+  },
+  textSizeControl: {
+    flexDirection: 'row',
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.pill,
+    overflow: 'hidden',
+  },
+  textSizeButton: {
+    minWidth: 54,
+    minHeight: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  controlDisabled: {
+    opacity: 0.35,
+  },
+  homeIntro: {
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  honestyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.base,
+    marginBottom: spacing.lg,
+  },
+  topicList: {
+    gap: spacing.base,
+  },
+  topicCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.base,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  topicIcon: {
+    width: 68,
+    height: 68,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  topicCopy: {
+    flex: 1,
+    gap: spacing.sm,
+  },
+  topicHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  statusPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: colors.ink,
+  },
+  statusReady: {
+    backgroundColor: '#E9F8EF',
+  },
+  statusSoon: {
+    backgroundColor: colors.surfaceSoft,
+  },
+  firstLessonRow: {
+    gap: 2,
+    marginTop: spacing.xs,
+  },
+  catalogNotice: {
+    marginTop: spacing.lg,
+    padding: spacing.base,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.orange,
+    backgroundColor: colors.warningSoft,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.md,
+  },
+  backButton: {
+    minWidth: 86,
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.control,
+  },
+  progressInfo: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  progressTrack: {
+    height: 10,
+    backgroundColor: colors.surfaceSoft,
+    borderRadius: radius.pill,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.green,
+    borderRadius: radius.pill,
+  },
+  eyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  miniMark: {
+    width: 18,
+    height: 18,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: colors.ink,
+  },
+  heading: {
+    marginTop: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  bodyStack: {
+    gap: spacing.md,
+  },
+  summaryBox: {
+    padding: spacing.lg,
+    backgroundColor: '#EEF8F2',
+    borderLeftWidth: 5,
+    borderLeftColor: colors.green,
+    borderRadius: radius.control,
+  },
+  noteBox: {
+    padding: spacing.lg,
+    backgroundColor: colors.warmNote,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.orange,
+    borderRadius: radius.control,
+  },
+  button: {
+    minHeight: 66,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.control,
+  },
+  secondaryButton: {
+    backgroundColor: colors.surface,
+  },
+  actions: {
+    gap: spacing.md,
+    marginTop: spacing.xl,
+    marginBottom: spacing.xxl,
+  },
+  recallHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  input: {
+    minHeight: 180,
+    marginTop: spacing.md,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+    fontFamily: 'GolosText_400Regular',
+    color: colors.text,
+    textAlignVertical: 'top',
+  },
+  aiPanel: {
+    marginTop: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.base,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.purple,
+  },
+  errorPanel: {
+    marginTop: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.base,
+    padding: spacing.lg,
+    backgroundColor: colors.warningSoft,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.orange,
+  },
+  feedbackPanel: {
+    marginTop: spacing.lg,
+    gap: spacing.lg,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.base,
+  },
+  feedbackTitle: {
+    flex: 1,
+    gap: spacing.sm,
+  },
+  feedbackSection: {
+    gap: spacing.xs,
+  },
+  feedbackActions: {
+    gap: spacing.md,
+    marginTop: spacing.sm,
+  },
+  textAction: {
+    minHeight: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.base,
+  },
 });
