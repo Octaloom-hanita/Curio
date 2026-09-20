@@ -20,12 +20,12 @@ export const topics: Topic[] = [
     ru: {
       title: 'Биомимикрия',
       description: 'Как живые системы решают инженерные задачи.',
-      first: 'Как термитник дышит?',
+      first: 'Как воздух движется без вентилятора?',
     },
     en: {
       title: 'Biomimicry',
       description: 'How living systems solve engineering problems.',
-      first: 'How does a termite mound breathe?',
+      first: 'How can air move without a fan?',
     },
   },
   {
