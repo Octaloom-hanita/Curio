@@ -93,11 +93,9 @@ Chrome microphone:
 
 ### P1 - Persistence and review
 
-Content schema/seed is prepared but not yet applied.
+Content schema and seed are live in Supabase and passed initial structural QA.
 
 Next:
-- connect/link the Supabase project
-- apply and QA the content migration + seed
 - decide anonymous first use vs account required
 - add user/progress/answers/review history in a later migration
 - migrate browser-local progress deliberately
