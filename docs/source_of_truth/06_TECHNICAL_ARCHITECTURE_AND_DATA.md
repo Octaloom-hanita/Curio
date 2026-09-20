@@ -26,9 +26,12 @@ Planned runtime:
 - Supabase Auth
 - Supabase Storage
 
-Prepared in repository, not yet applied to a Supabase project:
+Live in the Curio Supabase project:
 - content migration v1
+- content hardening migration
 - balanced bilingual content seed v1
+
+The live content database currently contains the curated draft foundation. Public application reads remain gated by editorial approval through RLS.
 
 ### Planned audio
 - ElevenLabs TTS
@@ -75,7 +78,7 @@ Planned:
 
 ## Data model - content
 
-The repository now contains an implementation-ready first migration for the content layer.
+The first content migration and seed are now applied to the live Curio Supabase project and remain versioned in the repository.
 It uses stable language-independent text IDs with RU/EN localized fields on the same records.
 
 Core tables/entities:
