@@ -2,6 +2,8 @@ export const colors = {
   orange: '#FF643D',
   green: '#35C97A',
   purple: '#B98BDE',
+  blue: '#5DA9FF',
+  yellow: '#FFD84D',
   ink: '#121212',
   text: '#1E1E1E',
   muted: '#555555',
@@ -26,6 +28,7 @@ export const spacing = {
 export const radius = {
   control: 18,
   surface: 22,
+  pill: 999,
 } as const;
 
 export const typeScale = {
