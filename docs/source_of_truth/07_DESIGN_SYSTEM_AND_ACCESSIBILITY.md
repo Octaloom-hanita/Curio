@@ -132,6 +132,7 @@ The termite MVP therefore uses abstract airflow/temperature/cycle visuals instea
 ### Production visual asset families
 
 Current code-level visual system:
+- `src/BrandSystem.tsx` - production implementation of The Opening mark
 - `src/IconSystem.tsx` - navigation, learning, audio/voice, feedback, utility and discovery icons
 - `src/IllustrationSystem.tsx` - mechanism illustrations, topic visuals and empty-state illustrations
 - `src/Visuals.tsx` - compatibility layer that maps learning-step scenes to the production illustration system
@@ -163,6 +164,13 @@ Empty-state set:
 - offline
 
 Visual assets should be implemented as reusable SVG-backed React Native components so the same source works on web now and native Expo later.
+
+Current UI polish rules:
+- use The Opening mark in the product header instead of a generic colored dot
+- use topic visuals on discovery cards when a dedicated visual exists
+- do not reduce entire unavailable cards with opacity; use clear status copy plus softer surfaces/borders so text remains readable
+- mechanism illustrations may sit on a quiet bounded surface, but explanatory text remains the dominant layer
+- use the same icon system for navigation controls such as Back instead of text glyph substitutes
 
 ## Motion
 

@@ -58,6 +58,7 @@ Updated: 2026-09-20
 
 ### Design
 - Official logo direction: The Opening.
+- The Opening has a reusable in-app vector implementation in `src/BrandSystem.tsx`.
 - Official illustration principle: Reveal the mechanism.
 - Production visuals use reusable vector/component assets, not crops from concept boards.
 - The production asset taxonomy includes UI icons, mechanism illustrations, topic visuals and empty states.
@@ -69,6 +70,7 @@ Updated: 2026-09-20
 - Illustrations support mechanisms.
 - No generic AI gradients, glassmorphism or dashboard aesthetic.
 - One clear next action.
+- Unavailable discovery items use softer surfaces and explicit status labels rather than low-opacity treatment that harms readability.
 
 ## Superseded decisions
 

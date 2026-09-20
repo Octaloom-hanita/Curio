@@ -22,8 +22,14 @@ import {
 import { AppText, AppTextScaleProvider } from './src/AppText';
 import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
-import { CurioIcon } from './src/IconSystem';
-import { CurioScene, type SceneName } from './src/Visuals';
+import { CurioMark } from './src/BrandSystem';
+import { CurioIcon, CurioIconBadge, type IconName } from './src/IconSystem';
+import {
+  CurioScene,
+  CurioTopicVisual,
+  type SceneName,
+  type TopicVisualName,
+} from './src/Visuals';
 import { topics as fallbackTopics, type Topic } from './src/topics';
 import { loadApprovedTopics } from './src/contentRepository';
 
@@ -36,6 +42,17 @@ const accentMap: Record<Accent, string> = {
   purple: colors.purple,
   blue: colors.blue,
   yellow: colors.yellow,
+};
+
+const topicVisualByIcon: Partial<Record<IconName, TopicVisualName>> = {
+  earth: 'earth',
+  leaf: 'life',
+  brain: 'brain',
+  bulb: 'cognition',
+  network: 'society',
+  body: 'body',
+  technology: 'technology',
+  microscope: 'science',
 };
 
 const sceneMap: SceneName[] = [
@@ -186,7 +203,7 @@ function Topbar({
         onPress={onHome}
         style={styles.brand}
       >
-        <View style={styles.brandDot} />
+        <CurioMark size={38} />
         <AppText variant="title">Curio</AppText>
       </Pressable>
 
@@ -213,6 +230,7 @@ function TopicCard({
 }) {
   const copy = topic[locale];
   const uiCopy = ui[locale];
+  const visualName = topicVisualByIcon[topic.icon];
 
   return (
     <Pressable
@@ -222,17 +240,23 @@ function TopicCard({
       onPress={onPress}
       style={({ pressed }) => [
         styles.topicCard,
-        !topic.ready && styles.topicCardDisabled,
+        topic.ready ? styles.topicCardReady : styles.topicCardSoon,
         pressed && { opacity: 0.82 },
       ]}
     >
-      <View
-        style={[
-          styles.topicIcon,
-          { backgroundColor: accentMap[topic.color] },
-        ]}
-      >
-        <CurioIcon name={topic.icon} size={40} color={colors.surface} accent={colors.surface} />
+      <View style={styles.topicVisual}>
+        {visualName ? (
+          <CurioTopicVisual name={visualName} size={88} />
+        ) : (
+          <CurioIconBadge
+            name={topic.icon}
+            size={72}
+            iconSize={38}
+            background={accentMap[topic.color]}
+            color={colors.surface}
+            accent={colors.surface}
+          />
+        )}
       </View>
 
       <View style={styles.topicCopy}>
@@ -312,8 +336,17 @@ function HomeScreen({
       )}
 
       <View style={styles.honestyNote}>
-        <CurioIcon name="bulb" size={42} color={colors.ink} accent={colors.yellow} />
-        <AppText variant="bodySmall">{copy.onlyOneReady}</AppText>
+        <CurioIconBadge
+          name="bulb"
+          size={54}
+          iconSize={32}
+          background={colors.yellow}
+          color={colors.ink}
+          accent={colors.orange}
+        />
+        <View style={styles.honestyCopy}>
+          <AppText variant="bodySmall">{copy.onlyOneReady}</AppText>
+        </View>
       </View>
 
       <View style={styles.topicList}>
@@ -353,7 +386,7 @@ function LessonProgress({
         onPress={onBack}
         style={styles.backButton}
       >
-        <AppText variant="title">‹</AppText>
+        <CurioIcon name="back" size={24} color={colors.ink} />
         <AppText variant="meta">{copy.back}</AppText>
       </Pressable>
 
@@ -605,7 +638,9 @@ export default function App() {
 
                 {[1, 2, 3, 4, 5, 9].includes(index) && (
                   <View style={styles.sceneBlock}>
-                    <CurioScene name={scene} />
+                    <View style={styles.sceneSurface}>
+                      <CurioScene name={scene} />
+                    </View>
                     <AppText variant="meta" color="muted" style={styles.sceneCaption}>
                       {scene === 'temperature'
                         ? copy.sceneHeat
@@ -890,14 +925,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 52,
   },
-  brandDot: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.orange,
-    borderWidth: 2,
-    borderColor: colors.ink,
-  },
   topbarActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -959,8 +986,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingVertical: spacing.base,
+    padding: spacing.base,
     marginBottom: spacing.lg,
+    backgroundColor: colors.warningSoft,
+    borderRadius: radius.surface,
+    borderWidth: 1.5,
+    borderColor: colors.hairline,
+  },
+  honestyCopy: {
+    flex: 1,
   },
   topicList: {
     gap: spacing.base,
@@ -970,23 +1004,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: spacing.base,
     padding: spacing.lg,
-    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: colors.ink,
     borderRadius: radius.surface,
   },
-  topicIcon: {
-    width: 68,
-    height: 68,
-    borderRadius: 20,
-    borderWidth: 2,
+  topicCardReady: {
+    backgroundColor: colors.surface,
     borderColor: colors.ink,
+  },
+  topicCardSoon: {
+    backgroundColor: colors.surfaceSoft,
+    borderColor: colors.hairline,
+  },
+  topicVisual: {
+    width: 88,
+    height: 88,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-  },
-  topicCardDisabled: {
-    opacity: 0.55,
   },
   topicCopy: {
     flex: 1,
@@ -1057,11 +1091,19 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   sceneBlock: {
-    marginBottom: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  sceneSurface: {
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.hairline,
+    borderRadius: 28,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.base,
   },
   sceneCaption: {
     textAlign: 'center',
-    marginTop: -8,
+    marginTop: spacing.sm,
   },
   eyebrowRow: {
     flexDirection: 'row',
