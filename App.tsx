@@ -27,7 +27,7 @@ import { topics as fallbackTopics, type Topic } from './src/topics';
 import { loadApprovedCatalog, loadApprovedImmersionSteps, type LessonStep } from './src/contentRepository';
 
 type Accent = 'orange' | 'green' | 'purple' | 'blue' | 'yellow';
-type Screen = 'home' | 'lesson';
+type Screen = 'home' | 'category' | 'lesson';
 
 const accentMap: Record<Accent, string> = {
   orange: colors.orange,
@@ -216,12 +216,9 @@ function TopicCard({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: !topic.ready }}
-      disabled={!topic.ready}
       onPress={onPress}
       style={({ pressed }) => [
         styles.topicCard,
-        !topic.ready && styles.topicCardDisabled,
         pressed && { opacity: 0.82 },
       ]}
     >
@@ -280,7 +277,7 @@ function HomeScreen({
   const copy = ui[locale];
 
   const select = (topic: Topic) => {
-    if (topic.ready) onSelect(topic);
+    onSelect(topic);
   };
 
   return (
@@ -326,6 +323,114 @@ function HomeScreen({
         ))}
       </View>
 
+    </>
+  );
+}
+
+
+function CategoryScreen({
+  topic,
+  locale,
+  onBack,
+  onStartImmersion,
+}: {
+  topic: Topic;
+  locale: Locale;
+  onBack: () => void;
+  onStartImmersion: (immersionId: string) => void;
+}) {
+  const copy = topic[locale];
+  const questions = topic.questions ?? [];
+
+  return (
+    <>
+      <View style={styles.progressRow}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onBack}
+          style={styles.backButton}
+        >
+          <AppText variant="title">‹</AppText>
+          <AppText variant="meta">{locale === 'ru' ? 'Назад' : 'Back'}</AppText>
+        </Pressable>
+      </View>
+
+      <View style={styles.categoryHero}>
+        <View
+          style={[
+            styles.topicIcon,
+            { backgroundColor: accentMap[topic.color] },
+          ]}
+        >
+          <CurioIcon name={topic.icon} size={44} fill={colors.surface} />
+        </View>
+        <View style={styles.categoryHeroCopy}>
+          <AppText variant="display" serif>
+            {copy.title}
+          </AppText>
+          <AppText variant="body" color="muted">
+            {copy.description}
+          </AppText>
+        </View>
+      </View>
+
+      <View style={styles.categorySectionHeader}>
+        <AppText variant="headline">
+          {locale === 'ru' ? 'Что можно исследовать' : 'Questions to explore'}
+        </AppText>
+        <AppText variant="bodySmall" color="muted">
+          {locale === 'ru'
+            ? 'Вопросы уже входят в карту Curio. Полное исследование открывается только после научной и редакционной проверки.'
+            : 'These questions are already part of the Curio map. A full exploration opens only after scientific and editorial review.'}
+        </AppText>
+      </View>
+
+      <View style={styles.questionList}>
+        {questions.map((question) => {
+          const ready = Boolean(question.immersionId);
+          return (
+            <View key={question.id} style={styles.questionCard}>
+              <View style={styles.questionCopy}>
+                <AppText variant="title">{question[locale]}</AppText>
+                <View
+                  style={[
+                    styles.statusPill,
+                    ready ? styles.statusReady : styles.statusSoon,
+                  ]}
+                >
+                  <AppText variant="meta">
+                    {ready
+                      ? locale === 'ru'
+                        ? 'Можно начать'
+                        : 'Ready to start'
+                      : locale === 'ru'
+                      ? 'Готовится'
+                      : 'In preparation'}
+                  </AppText>
+                </View>
+              </View>
+              {question.immersionId && (
+                <PrimaryButton
+                  label={locale === 'ru' ? 'Открыть исследование' : 'Open exploration'}
+                  onPress={() => onStartImmersion(question.immersionId!)}
+                  accent={topic.color}
+                />
+              )}
+            </View>
+          );
+        })}
+
+        {questions.length === 0 && (
+          <View style={styles.honestyNote}>
+            <CurioIcon name="bulb" size={42} fill={colors.yellow} />
+            <AppText variant="bodySmall">
+              {locale === 'ru'
+                ? 'Карта вопросов для этой области загружается.'
+                : 'The question map for this area is loading.'}
+            </AppText>
+          </View>
+        )}
+      </View>
     </>
   );
 }
@@ -392,6 +497,7 @@ export default function App() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const [catalogTopics, setCatalogTopics] = useState<Topic[]>(fallbackTopics);
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [lessonSteps, setLessonSteps] = useState<LessonStep[]>([]);
   const [activeImmersionId, setActiveImmersionId] = useState('immersion_termite_reference');
   const [isLessonLoading, setIsLessonLoading] = useState(false);
@@ -500,6 +606,7 @@ export default function App() {
 
   const goHome = () => {
     setScreen('home');
+    setSelectedTopic(null);
     resetEvaluation();
   };
 
@@ -510,9 +617,13 @@ export default function App() {
     setIsLessonLoading(false);
   };
 
-  const startTopic = async (topic: Topic) => {
-    if (!topic.immersionId) return;
-    const immersionId = topic.immersionId;
+  const openCategory = (topic: Topic) => {
+    setSelectedTopic(topic);
+    setScreen('category');
+    resetEvaluation();
+  };
+
+  const startImmersion = async (immersionId: string) => {
     setActiveImmersionId(immersionId);
     setScreen('lesson');
     setIndex(0);
@@ -546,7 +657,12 @@ export default function App() {
   const goBack = () => {
     resetEvaluation();
     if (index === 0) {
-      goHome();
+      if (selectedTopic) {
+        setScreen('category');
+        resetEvaluation();
+      } else {
+        goHome();
+      }
       return;
     }
     setIndex((value) => Math.max(0, value - 1));
@@ -749,9 +865,16 @@ export default function App() {
               <HomeScreen
                 locale={locale}
                 topics={catalogTopics}
-                onSelect={startTopic}
+                onSelect={openCategory}
                 hasSession={hasSession}
                 onResume={resumeLesson}
+              />
+            ) : screen === 'category' && selectedTopic ? (
+              <CategoryScreen
+                topic={selectedTopic}
+                locale={locale}
+                onBack={goHome}
+                onStartImmersion={startImmersion}
               />
             ) : (
               <>
@@ -1200,9 +1323,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  topicCardDisabled: {
-    opacity: 0.55,
-  },
   topicCopy: {
     flex: 1,
     gap: spacing.sm,
@@ -1230,6 +1350,35 @@ const styles = StyleSheet.create({
   firstLessonRow: {
     gap: 2,
     marginTop: spacing.xs,
+  },
+  categoryHero: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  categoryHeroCopy: {
+    flex: 1,
+    gap: spacing.sm,
+  },
+  categorySectionHeader: {
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  questionList: {
+    gap: spacing.base,
+    marginBottom: spacing.xxl,
+  },
+  questionCard: {
+    gap: spacing.base,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  questionCopy: {
+    gap: spacing.sm,
   },
   catalogNotice: {
     marginTop: spacing.lg,
