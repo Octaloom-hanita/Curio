@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { createContext, type PropsWithChildren, useContext } from 'react';
 import { StyleSheet, Text, type TextStyle } from 'react-native';
 import { colors, typeScale } from './theme';
 
@@ -11,6 +11,19 @@ type Props = PropsWithChildren<{
   style?: TextStyle | TextStyle[];
 }>;
 
+const TextScaleContext = createContext(1);
+
+export function AppTextScaleProvider({
+  scale,
+  children,
+}: PropsWithChildren<{ scale: number }>) {
+  return (
+    <TextScaleContext.Provider value={scale}>
+      {children}
+    </TextScaleContext.Provider>
+  );
+}
+
 const fonts: Record<Variant, string> = {
   display: 'GolosText_700Bold',
   headline: 'GolosText_700Bold',
@@ -21,13 +34,29 @@ const fonts: Record<Variant, string> = {
   meta: 'GolosText_400Regular',
 };
 
-export function AppText({ children, variant = 'body', serif = false, color = 'text', style }: Props) {
+export function AppText({
+  children,
+  variant = 'body',
+  serif = false,
+  color = 'text',
+  style,
+}: Props) {
+  const scale = useContext(TextScaleContext);
+  const base = typeScale[variant];
+
   return (
     <Text
+      allowFontScaling
       style={[
         styles.base,
-        typeScale[variant],
-        { color: colors[color], fontFamily: serif ? 'Literata_600SemiBold' : fonts[variant] },
+        {
+          fontSize: Math.round(base.fontSize * scale),
+          lineHeight: Math.round(base.lineHeight * scale),
+        },
+        {
+          color: colors[color],
+          fontFamily: serif ? 'Literata_600SemiBold' : fonts[variant],
+        },
         style,
       ]}
     >
