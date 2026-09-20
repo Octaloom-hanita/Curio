@@ -448,6 +448,7 @@ export default function App() {
   const copy = ui[locale];
   const step = copy.steps[index];
   const kind = step.kind;
+  const cta = 'cta' in step ? step.cta : undefined;
   const scene = sceneMap[index] ?? 'flow';
   const accent = accentByStep[index] ?? 'green';
   const summaryIndex = 6;
@@ -804,10 +805,10 @@ export default function App() {
                   </>
                 )}
 
-                {kind !== 'recall' && step.cta && (
+                {kind !== 'recall' && cta && (
                   <View style={styles.actions}>
                     <PrimaryButton
-                      label={step.cta}
+                      label={cta}
                       onPress={goNext}
                       accent={accent}
                     />
