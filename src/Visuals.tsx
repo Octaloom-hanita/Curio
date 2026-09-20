@@ -12,8 +12,6 @@ export type IconName =
   | 'microscope'
   | 'atom';
 
-const fills = [colors.orange, colors.green, colors.purple, colors.blue, colors.yellow];
-
 export function CurioIcon({
   name,
   size = 56,
@@ -24,7 +22,12 @@ export function CurioIcon({
   fill?: string;
 }) {
   const c = fill ?? colors.orange;
-  const s = { stroke: colors.ink, strokeWidth: 3.5, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  const s = {
+    stroke: colors.ink,
+    strokeWidth: 3.2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+  };
 
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64">
@@ -33,15 +36,18 @@ export function CurioIcon({
         <Path d="M24 39 L27 49 H37 L40 39" fill={colors.canvas} {...s} />
         <Line x1="28" y1="54" x2="36" y2="54" {...s} />
       </>}
+
       {name === 'leaf' && <>
         <Path d="M12 44 C15 18, 36 10, 52 14 C52 34, 39 51, 18 50 Z" fill={c} {...s} />
         <Path d="M18 49 C29 38, 37 31, 49 19" fill="none" {...s} />
       </>}
+
       {name === 'brain' && <>
         <Path d="M31 14 C24 7, 14 13, 16 22 C8 23, 9 35, 16 36 C12 45, 23 52, 31 46 Z" fill={c} {...s} />
         <Path d="M33 14 C40 7, 50 13, 48 22 C56 23, 55 35, 48 36 C52 45, 41 52, 33 46 Z" fill={colors.purple} {...s} />
         <Path d="M32 15 V47" fill="none" {...s} />
       </>}
+
       {name === 'network' && <>
         <Circle cx="15" cy="20" r="7" fill={colors.orange} {...s} />
         <Circle cx="49" cy="18" r="7" fill={colors.green} {...s} />
@@ -50,23 +56,27 @@ export function CurioIcon({
         <Line x1="19" y1="26" x2="27" y2="42" {...s} />
         <Line x1="44" y1="24" x2="35" y2="41" {...s} />
       </>}
+
       {name === 'book' && <>
         <Path d="M10 16 Q22 11 31 18 V50 Q22 43 10 48 Z" fill={c} {...s} />
         <Path d="M54 16 Q42 11 33 18 V50 Q42 43 54 48 Z" fill={colors.surface} {...s} />
         <Line x1="32" y1="18" x2="32" y2="50" {...s} />
       </>}
+
       {name === 'audio' && <>
         <Rect x="9" y="22" width="14" height="20" rx="4" fill={c} {...s} />
         <Path d="M23 27 L36 18 V46 L23 37 Z" fill={colors.green} {...s} />
         <Path d="M43 24 C49 29, 49 35, 43 40" fill="none" {...s} />
         <Path d="M48 19 C58 27, 58 37, 48 45" fill="none" {...s} />
       </>}
+
       {name === 'microscope' && <>
         <Path d="M25 12 L38 18 L31 33 L18 27 Z" fill={c} {...s} />
         <Path d="M35 30 C48 34, 47 48, 35 51" fill="none" {...s} />
         <Line x1="19" y1="31" x2="31" y2="36" {...s} />
         <Rect x="15" y="48" width="34" height="7" rx="3" fill={colors.green} {...s} />
       </>}
+
       {name === 'atom' && <>
         <Circle cx="32" cy="32" r="5" fill={c} {...s} />
         <Ellipse cx="32" cy="32" rx="25" ry="10" fill="none" {...s} />
@@ -77,101 +87,77 @@ export function CurioIcon({
   );
 }
 
-export function IconShelf() {
-  const items: IconName[] = ['book', 'leaf', 'brain', 'network', 'microscope', 'atom'];
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginVertical: 18 }}>
-      {items.map((name, i) => (
-        <View
-          key={name}
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 22,
-            borderWidth: 2,
-            borderColor: colors.ink,
-            backgroundColor: colors.surface,
-            alignItems: 'center',
-            justifyContent: 'center',
-            transform: [{ rotate: i % 2 === 0 ? '-2deg' : '2deg' }],
-          }}
-        >
-          <CurioIcon name={name} size={48} fill={fills[i % fills.length]} />
-        </View>
-      ))}
-    </View>
-  );
-}
+export type SceneName = 'flow' | 'heat' | 'cycle' | 'recall' | 'connection' | 'complete';
 
-export type SceneName = 'mound' | 'heat' | 'cycle' | 'recall' | 'connection' | 'complete';
+const arrow = {
+  stroke: colors.ink,
+  strokeWidth: 4,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+};
 
 export function CurioScene({ name }: { name: SceneName }) {
-  const common = { stroke: colors.ink, strokeWidth: 4, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
-
   return (
-    <View style={{ alignItems: 'center', marginVertical: 18 }}>
-      <Svg width="300" height="190" viewBox="0 0 300 190">
-        {name === 'mound' && <>
-          <Circle cx="244" cy="38" r="24" fill={colors.yellow} {...common} />
-          <Line x1="30" y1="160" x2="270" y2="160" {...common} />
-          <Path d="M72 158 C84 132, 90 100, 111 80 C127 65, 132 48, 150 40 C170 51, 175 70, 190 84 C210 103, 218 132, 228 158 Z" fill={colors.orange} {...common} />
-          <Path d="M150 52 C143 74, 143 92, 149 111 C154 128, 154 142, 151 154" fill="none" {...common} />
-          <Path d="M150 85 C128 89, 116 101, 105 116" fill="none" {...common} />
-          <Path d="M151 100 C172 105, 185 116, 195 132" fill="none" {...common} />
-          <Ellipse cx="118" cy="125" rx="17" ry="11" fill={colors.canvas} {...common} />
-          <Ellipse cx="179" cy="139" rx="16" ry="10" fill={colors.canvas} {...common} />
-          <Path d="M95 128 C60 120, 52 91, 70 73" fill="none" {...common} />
-          <Path d="M205 132 C239 119, 248 91, 229 74" fill="none" {...common} />
-          <Path d="M69 73 L66 91 L84 83" fill={colors.green} {...common} />
-          <Path d="M230 74 L234 92 L216 84" fill={colors.purple} {...common} />
-          <Circle cx="94" cy="166" r="4" fill={colors.ink} />
-          <Circle cx="109" cy="168" r="4" fill={colors.ink} />
-          <Line x1="90" y1="164" x2="84" y2="160" {...common} />
-          <Line x1="98" y1="164" x2="103" y2="159" {...common} />
-          <Line x1="105" y1="166" x2="100" y2="161" {...common} />
-          <Line x1="113" y1="166" x2="119" y2="161" {...common} />
+    <View
+      accessibilityElementsHidden
+      style={{ alignItems: 'center', marginVertical: 18 }}
+    >
+      <Svg width="320" height="170" viewBox="0 0 320 170">
+        {name === 'flow' && <>
+          <Circle cx="263" cy="35" r="21" fill={colors.yellow} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M42 75 C83 36, 135 38, 174 68 C208 94, 238 91, 272 65" fill="none" {...arrow} />
+          <Path d="M263 58 L274 65 L265 75" fill="none" {...arrow} />
+          <Path d="M45 116 C83 145, 130 141, 164 116 C199 91, 232 98, 271 126" fill="none" {...arrow} />
+          <Path d="M261 117 L272 126 L260 133" fill="none" {...arrow} />
+          <Circle cx="92" cy="91" r="7" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="151" cy="55" r="6" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="214" cy="123" r="7" fill={colors.blue} stroke={colors.ink} strokeWidth="2.5" />
         </>}
+
         {name === 'heat' && <>
-          <Circle cx="68" cy="50" r="28" fill={colors.yellow} {...common} />
-          <Path d="M116 160 C120 110, 132 78, 150 48 C169 78, 181 110, 185 160 Z" fill={colors.orange} {...common} />
-          <Path d="M214 45 C205 56, 205 68, 214 79" fill="none" {...common} />
-          <Path d="M234 39 C221 55, 221 72, 234 87" fill="none" {...common} />
-          <Path d="M112 134 C139 122, 161 122, 188 134" fill="none" {...common} />
-          <Circle cx="151" cy="114" r="12" fill={colors.purple} {...common} />
+          <Circle cx="75" cy="45" r="27" fill={colors.orange} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="244" cy="123" r="27" fill={colors.blue} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M97 58 C132 76, 170 77, 218 105" fill="none" {...arrow} />
+          <Path d="M207 94 L220 105 L204 109" fill="none" {...arrow} />
+          <Path d="M222 125 C178 144, 126 140, 89 72" fill="none" {...arrow} />
+          <Path d="M94 85 L88 70 L104 73" fill="none" {...arrow} />
+          <Circle cx="150" cy="102" r="9" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
         </>}
+
         {name === 'cycle' && <>
-          <Circle cx="150" cy="95" r="50" fill={colors.surface} {...common} />
-          <Path d="M118 67 C140 42, 180 49, 190 77" fill="none" {...common} />
-          <Path d="M190 77 L173 73 L181 91" fill={colors.green} {...common} />
-          <Path d="M182 122 C160 147, 120 140, 110 112" fill="none" {...common} />
-          <Path d="M110 112 L127 116 L119 98" fill={colors.purple} {...common} />
-          <Circle cx="58" cy="52" r="22" fill={colors.yellow} {...common} />
-          <Path d="M235 58 C247 64, 252 77, 248 90 C232 90, 221 80, 221 66 C226 62, 230 60, 235 58 Z" fill={colors.blue} {...common} />
+          <Circle cx="160" cy="84" r="48" fill={colors.surface} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M124 61 C143 37, 180 35, 199 58" fill="none" {...arrow} />
+          <Path d="M190 49 L201 58 L188 66" fill="none" {...arrow} />
+          <Path d="M198 108 C178 132, 141 134, 122 111" fill="none" {...arrow} />
+          <Path d="M131 120 L120 111 L133 103" fill="none" {...arrow} />
+          <Circle cx="68" cy="48" r="21" fill={colors.yellow} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M244 41 C258 47, 264 62, 258 76 C242 76, 231 66, 231 52 C235 47, 239 44, 244 41 Z" fill={colors.purple} stroke={colors.ink} strokeWidth="3" />
         </>}
+
         {name === 'recall' && <>
-          <Rect x="66" y="40" width="168" height="108" rx="28" fill={colors.purple} {...common} />
-          <Path d="M111 95 C111 68, 136 57, 153 71 C171 56, 195 69, 193 94 C192 115, 171 125, 153 113 C136 126, 111 115, 111 95 Z" fill={colors.surface} {...common} />
-          <Path d="M151 72 V114" fill="none" {...common} />
-          <Circle cx="76" cy="47" r="15" fill={colors.orange} {...common} />
-          <Circle cx="229" cy="145" r="16" fill={colors.green} {...common} />
+          <Rect x="69" y="32" width="182" height="108" rx="25" fill={colors.surface} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M113 86 C113 64, 134 53, 151 65 C169 52, 193 65, 192 87 C191 108, 171 118, 152 106 C134 119, 113 108, 113 86 Z" fill={colors.purple} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M152 66 V106" fill="none" {...arrow} />
+          <Circle cx="77" cy="38" r="12" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="246" cy="136" r="12" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
         </>}
+
         {name === 'connection' && <>
-          <Circle cx="72" cy="94" r="24" fill={colors.orange} {...common} />
-          <Circle cx="150" cy="48" r="24" fill={colors.green} {...common} />
-          <Circle cx="230" cy="103" r="24" fill={colors.purple} {...common} />
-          <Circle cx="150" cy="146" r="24" fill={colors.blue} {...common} />
-          <Line x1="93" y1="82" x2="129" y2="60" {...common} />
-          <Line x1="171" y1="60" x2="208" y2="89" {...common} />
-          <Line x1="208" y1="116" x2="171" y2="137" {...common} />
-          <Line x1="129" y1="137" x2="93" y2="107" {...common} />
-          <Line x1="94" y1="95" x2="206" y2="102" {...common} />
+          <Circle cx="70" cy="85" r="23" fill={colors.orange} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="160" cy="46" r="23" fill={colors.green} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="250" cy="91" r="23" fill={colors.purple} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="160" cy="133" r="23" fill={colors.blue} stroke={colors.ink} strokeWidth="3" />
+          <Line x1="91" y1="76" x2="139" y2="55" {...arrow} />
+          <Line x1="181" y1="56" x2="229" y2="81" {...arrow} />
+          <Line x1="229" y1="103" x2="181" y2="124" {...arrow} />
+          <Line x1="139" y1="124" x2="91" y2="96" {...arrow} />
         </>}
+
         {name === 'complete' && <>
-          <Path d="M77 142 L77 68 Q112 58 145 77 V151 Q112 132 77 142 Z" fill={colors.orange} {...common} />
-          <Path d="M223 68 Q188 58 155 77 V151 Q188 132 223 142 Z" fill={colors.surface} {...common} />
-          <Circle cx="238" cy="47" r="22" fill={colors.green} {...common} />
-          <Path d="M228 47 L236 55 L249 39" fill="none" {...common} />
-          <Circle cx="59" cy="50" r="16" fill={colors.yellow} {...common} />
+          <Circle cx="160" cy="82" r="51" fill={colors.green} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M134 82 L153 101 L190 61" fill="none" {...arrow} />
+          <Circle cx="85" cy="43" r="12" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="235" cy="122" r="13" fill={colors.purple} stroke={colors.ink} strokeWidth="2.5" />
         </>}
       </Svg>
     </View>
