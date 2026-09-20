@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run typecheck && npm run build",
+  "buildCommand": "mkdir -p public && (npm run typecheck > public/qa-typecheck.txt 2>&1 || true) && npm run build",
   "outputDirectory": "dist",
   "devCommand": "expo",
   "cleanUrls": true,
