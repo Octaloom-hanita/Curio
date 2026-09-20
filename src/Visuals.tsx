@@ -112,13 +112,24 @@ export function CurioScene({ name }: { name: SceneName }) {
     <View style={{ alignItems: 'center', marginVertical: 18 }}>
       <Svg width="300" height="190" viewBox="0 0 300 190">
         {name === 'mound' && <>
-          <Circle cx="238" cy="38" r="26" fill={colors.yellow} {...common} />
-          <Path d="M105 160 C112 116, 123 81, 150 40 C177 81, 188 116, 195 160 Z" fill={colors.orange} {...common} />
-          <Path d="M142 150 C140 115, 141 91, 150 61 C158 91, 159 115, 157 150" fill={colors.canvas} {...common} />
-          <Path d="M106 137 C70 122, 66 88, 92 72" fill="none" {...common} />
-          <Path d="M194 137 C230 122, 234 88, 208 72" fill="none" {...common} />
-          <Path d="M91 72 L87 91 L105 83" fill={colors.green} {...common} />
-          <Path d="M209 72 L213 91 L195 83" fill={colors.purple} {...common} />
+          <Circle cx="244" cy="38" r="24" fill={colors.yellow} {...common} />
+          <Line x1="30" y1="160" x2="270" y2="160" {...common} />
+          <Path d="M72 158 C84 132, 90 100, 111 80 C127 65, 132 48, 150 40 C170 51, 175 70, 190 84 C210 103, 218 132, 228 158 Z" fill={colors.orange} {...common} />
+          <Path d="M150 52 C143 74, 143 92, 149 111 C154 128, 154 142, 151 154" fill="none" {...common} />
+          <Path d="M150 85 C128 89, 116 101, 105 116" fill="none" {...common} />
+          <Path d="M151 100 C172 105, 185 116, 195 132" fill="none" {...common} />
+          <Ellipse cx="118" cy="125" rx="17" ry="11" fill={colors.canvas} {...common} />
+          <Ellipse cx="179" cy="139" rx="16" ry="10" fill={colors.canvas} {...common} />
+          <Path d="M95 128 C60 120, 52 91, 70 73" fill="none" {...common} />
+          <Path d="M205 132 C239 119, 248 91, 229 74" fill="none" {...common} />
+          <Path d="M69 73 L66 91 L84 83" fill={colors.green} {...common} />
+          <Path d="M230 74 L234 92 L216 84" fill={colors.purple} {...common} />
+          <Circle cx="94" cy="166" r="4" fill={colors.ink} />
+          <Circle cx="109" cy="168" r="4" fill={colors.ink} />
+          <Line x1="90" y1="164" x2="84" y2="160" {...common} />
+          <Line x1="98" y1="164" x2="103" y2="159" {...common} />
+          <Line x1="105" y1="166" x2="100" y2="161" {...common} />
+          <Line x1="113" y1="166" x2="119" y2="161" {...common} />
         </>}
         {name === 'heat' && <>
           <Circle cx="68" cy="50" r="28" fill={colors.yellow} {...common} />
