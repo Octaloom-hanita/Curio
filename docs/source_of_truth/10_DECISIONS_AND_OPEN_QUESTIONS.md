@@ -1,6 +1,6 @@
 # Curio - Decisions and Open Questions
 
-Updated: 2026-09-20
+Updated: 2026-09-21
 
 ## Confirmed decisions
 
@@ -39,6 +39,8 @@ Updated: 2026-09-20
 - Discovery is broader than publication: curated question/book/phenomenon metadata may be browsable while full Immersions remain gated.
 - Current discovery sequence is Featured Questions -> Areas -> Books -> Phenomena.
 - Books open questions; they are not presented as book-summary products.
+- Full learning content remains gated until its question, rubric, learning steps and scientific claim mapping pass editorial review.
+- Five full Immersions now meet the current approval gate. This is enough content diversity for the first supervised product-validation round; additional content expansion should wait for that evidence.
 
 ### AI
 - Current evaluation provider is Gemini through Vercel server-side code.
@@ -83,18 +85,19 @@ The following older ideas are no longer canonical:
 - Literal termite mound illustration -> superseded by abstract mechanism visuals.
 - Showing placeholder audio/microphone controls -> superseded by hide-until-functional.
 - Very muted quiet-study visual direction -> evolved into a brighter Curious Study direction while preserving reading clarity.
+- Expanding more Immersions before validating the first approved content set -> superseded by first-user validation as the current product checkpoint.
 
 ## Open questions
 
 ### Content
 - How much book-level learning versus concept/phenomenon learning belongs in MVP?
-- Which of the first six Immersion skeletons should reach scientific/editorial approval first?
+- After first-user validation, should T01 sensor measurement, L01 tree-water transport, or a different question become the next approved Immersion?
 - Which additional profession/field lenses are useful enough in discovery to justify a future dedicated entity?
 
 ### Sources and rights
 - Which uploaded book copies are verified as lawfully acquired?
 - Which open-access licenses permit internal research, derivative content or commercial reuse?
-- What exact source-review workflow will be used before approval?
+- The working approval gate is now claim mapping -> scientific/editorial QA -> bilingual content/rubric QA -> approval. Exact human ownership/sign-off rules for a broader public product remain open.
 
 ### Audio
 - Which ElevenLabs Russian voice?
@@ -122,36 +125,49 @@ The following older ideas are no longer canonical:
 - Personal project/private alpha first.
 - Future public/commercial model remains undecided.
 
+## Current content checkpoint
+
+The balanced Content DB is live in Supabase and the first approval wave has completed.
+
+Current database state verified on 2026-09-21:
+- 8 discovery areas
+- 31 questions
+- 42 Concepts
+- 8 books
+- 46 Source records
+- 182 content-source mappings
+- 8 Immersion records total
+- 5 approved full Immersions
+- 2 draft Immersions with evidence gaps
+- 1 deprecated duplicate Immersion
+- 78 Immersion steps total
+
+Approved full Immersions:
+1. termite airflow / self-organization reference
+2. B01 attention and inattentional blindness
+3. B02 memory stability
+4. B03 multisensory balance control
+5. W01 river baseflow and delayed water storage
+
+Integrity QA confirmed for every approved Immersion:
+- approved primary question
+- approved rubric
+- all steps approved and bilingual
+- one correctly linked recall step
+- connection and completion states
+- source mappings for scientific claims
+- source mappings for linked Concepts
+
+The original termite reference slice had been the remaining source-traceability exception. On 2026-09-21 it was mapped to peer-reviewed primary work on diurnal thermal ventilation, African mound airflow and decentralized mound morphogenesis, and its evidence status was changed to verified.
+
 ## Next planning checkpoint
 
-Do not add many random topics directly to code.
-
-The first balanced Content DB schema and seed are now live in Supabase and versioned in the repository.
-
-Initial QA confirmed:
-- 18 content tables
-- RLS enabled on every content table
-- 8 discovery areas
-- 30 bilingual questions
-- 23 first-wave concepts
-- 6 first-wave Immersion skeletons
-- 8 project source records
-- 0 approved Immersions, intentionally
-
-Current discovery/content state:
-- 8 discovery areas are browsable
-- 31 curated discovery questions are visible (30-question seed + termite reference question)
-- 8 project books are visible as discovery/research objects
-- 1 phenomenon is currently mapped
-- 1 full Immersion (termite reference) is approved
-- B01 attention/inattentional-blindness is evidence-verified but remains ai_generated pending owner/editorial approval
-- Chrome voice record -> transcribe -> edit -> confirm -> evaluate is implemented
-- ElevenLabs generation/storage foundation is implemented; playback remains pending
+The next bottleneck is real-user evidence, not more content volume.
 
 Next:
-1. Validate the new Today/Explore discovery experience with the first user.
-2. Complete editorial approval of B01 before publishing or generating TTS from it.
-3. Add audio playback for ready audio assets.
-4. Decide anonymous first use vs account required.
-5. Add learner/progress/review persistence in a later migration.
-6. Keep explanatory content, rubrics and learning steps gated until approval.
+1. Observe the first older-adult user using Today and Explore without assistance.
+2. Have the learner complete at least one of B01, B02, B03 or W01 end to end.
+3. Log orientation, navigation, reading, recall-prompt and feedback comprehension failures separately.
+4. Fix the smallest high-impact UX/content issues found in that session.
+5. Then prioritize audio playback and durable learner persistence/delayed review.
+6. Keep T01, L01 and new explanatory content gated until evidence and editorial approval are complete.
