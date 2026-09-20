@@ -52,6 +52,14 @@ const accentMap: Record<Accent, string> = {
   yellow: colors.yellow,
 };
 
+const accentTintMap: Record<Accent, string> = {
+  orange: colors.orangeSoft,
+  green: colors.greenSoft,
+  purple: colors.purpleSoft,
+  blue: colors.blueSoft,
+  yellow: colors.yellowSoft,
+};
+
 const topicVisualByIcon: Partial<Record<IconName, TopicVisualName>> = {
   earth: 'earth',
   leaf: 'life',
@@ -236,7 +244,7 @@ function BottomNavigation({
             >
               <CurioIcon
                 name={item.icon}
-                size={28}
+                size={34}
                 color={colors.ink}
                 accent={item.accent}
               />
@@ -277,7 +285,7 @@ function Topbar({
         onPress={onHome}
         style={styles.brand}
       >
-        <CurioMark size={30} />
+        <CurioMark size={28} />
         <AppText variant="title">Curio</AppText>
       </Pressable>
 
@@ -311,12 +319,16 @@ function TopicCard({
       onPress={onPress}
       style={({ pressed }) => [
         styles.topicCard,
+        {
+          backgroundColor: accentTintMap[topic.color],
+          borderColor: accentMap[topic.color],
+        },
         pressed && { opacity: 0.82 },
       ]}
     >
       <View style={styles.topicVisual}>
         {visualName ? (
-          <CurioTopicVisual name={visualName} size={88} />
+          <CurioTopicVisual name={visualName} size={96} />
         ) : (
           <CurioIconBadge
             name={topic.icon}
@@ -369,13 +381,17 @@ function DiscoveryQuestionCard({
       onPress={onPress}
       style={({ pressed }) => [
         styles.discoveryQuestionCard,
+        {
+          backgroundColor: topic ? accentTintMap[topic.color] : colors.yellowSoft,
+          borderColor: topic ? accentMap[topic.color] : colors.yellow,
+        },
         pressed && { opacity: 0.82 },
       ]}
     >
       <View style={styles.discoveryQuestionMeta}>
         <CurioIcon
           name={topic?.icon ?? 'bulb'}
-          size={28}
+          size={36}
           color={colors.ink}
           accent={topic ? accentMap[topic.color] : colors.yellow}
         />
@@ -554,7 +570,7 @@ function ExploreScreen({
                   name="book"
                   size={52}
                   iconSize={28}
-                  background={colors.surfaceSoft}
+                  background={colors.orangeSoft}
                   color={colors.ink}
                   accent={colors.orange}
                 />
@@ -598,7 +614,7 @@ function ExploreScreen({
                 onPress={() => onPhenomenonSelect(phenomenon)}
                 style={({ pressed }) => [styles.phenomenonCard, pressed && { opacity: 0.82 }]}
               >
-                <CurioIcon name="microscope" size={32} color={colors.ink} accent={colors.purple} />
+                <CurioIcon name="microscope" size={42} color={colors.ink} accent={colors.purple} />
                 <View style={styles.phenomenonCopy}>
                   <AppText variant="title">{phenomenon[locale].title}</AppText>
                   <AppText variant="bodySmall" color="muted">{phenomenon[locale].description}</AppText>
@@ -658,10 +674,15 @@ function CategoryScreen({
         </Pressable>
       </View>
 
-      <View style={styles.categoryHero}>
+      <View
+        style={[
+          styles.categoryHero,
+          { backgroundColor: accentTintMap[topic.color] },
+        ]}
+      >
         <View style={styles.categoryVisual}>
           {visualName ? (
-            <CurioTopicVisual name={visualName} size={104} />
+            <CurioTopicVisual name={visualName} size={116} />
           ) : (
             <CurioIconBadge
               name={topic.icon}
@@ -1600,12 +1621,16 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'space-between',
     backgroundColor: colors.surface,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.hairline,
-    borderRadius: 24,
+    borderRadius: 26,
     paddingHorizontal: spacing.sm,
-    paddingTop: spacing.sm,
-    paddingBottom: 6,
+    paddingTop: 8,
+    paddingBottom: 5,
+    shadowColor: colors.ink,
+    shadowOpacity: 0.06,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
   },
   bottomNavItem: {
     flex: 1,
@@ -1617,7 +1642,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   bottomNavItemActive: {
-    backgroundColor: '#FFF8F3',
+    backgroundColor: colors.orangeSoft,
   },
   bottomNavItemDisabled: {
     opacity: 0.38,
@@ -1636,7 +1661,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexWrap: 'wrap',
     gap: spacing.md,
+    paddingBottom: spacing.md,
     marginBottom: spacing.xl,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.hairline,
   },
   brand: {
     flexDirection: 'row',
@@ -1687,7 +1715,8 @@ const styles = StyleSheet.create({
   },
   homeIntro: {
     gap: spacing.md,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
+    maxWidth: 680,
   },
   resumeCard: {
     gap: spacing.base,
@@ -1716,28 +1745,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topicList: {
-    gap: spacing.base,
+    gap: spacing.md,
   },
   topicCard: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.base,
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.ink,
-    borderRadius: radius.surface,
+    alignItems: 'center',
+    gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 20,
+    borderWidth: 1.5,
+    borderRadius: 26,
   },
   topicVisual: {
-    width: 88,
-    height: 88,
+    width: 98,
+    height: 98,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
   categoryVisual: {
-    width: 108,
-    height: 108,
+    width: 120,
+    height: 120,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -1774,8 +1802,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   discoverySection: {
-    gap: spacing.base,
-    marginBottom: spacing.xxl,
+    gap: spacing.lg,
+    marginBottom: 56,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.hairline,
   },
   discoverySectionHeader: {
     gap: spacing.xs,
@@ -1784,12 +1815,10 @@ const styles = StyleSheet.create({
     gap: spacing.base,
   },
   discoveryQuestionCard: {
-    gap: spacing.sm,
+    gap: spacing.md,
     padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.ink,
-    borderRadius: radius.surface,
+    borderWidth: 1.5,
+    borderRadius: 26,
   },
   discoveryQuestionMeta: {
     flexDirection: 'row',
@@ -1802,20 +1831,19 @@ const styles = StyleSheet.create({
   },
   todayExplore: {
     gap: spacing.md,
-    padding: spacing.lg,
+    padding: spacing.xl,
     marginBottom: spacing.xxl,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.ink,
-    borderRadius: radius.surface,
+    backgroundColor: colors.orangeSoft,
+    borderWidth: 1.5,
+    borderColor: colors.orange,
+    borderRadius: 28,
   },
   bookCard: {
     gap: spacing.md,
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.hairline,
-    borderRadius: radius.surface,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.canvas,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.hairline,
   },
   bookCardTop: {
     flexDirection: 'row',
@@ -1828,13 +1856,13 @@ const styles = StyleSheet.create({
   },
   phenomenonCard: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.md,
+    alignItems: 'center',
+    gap: spacing.lg,
     padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.ink,
-    borderRadius: radius.surface,
+    backgroundColor: colors.purpleSoft,
+    borderWidth: 1.5,
+    borderColor: colors.purple,
+    borderRadius: 26,
   },
   phenomenonCopy: {
     flex: 1,
@@ -1842,9 +1870,11 @@ const styles = StyleSheet.create({
   },
   categoryHero: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.lg,
-    marginBottom: spacing.xl,
+    alignItems: 'center',
+    gap: spacing.xl,
+    padding: spacing.xl,
+    marginBottom: spacing.xxl,
+    borderRadius: 30,
   },
   categoryHeroCopy: {
     flex: 1,
@@ -1860,11 +1890,10 @@ const styles = StyleSheet.create({
   },
   questionCard: {
     gap: spacing.base,
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.ink,
-    borderRadius: radius.surface,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.canvas,
+    borderBottomWidth: 1.5,
+    borderBottomColor: colors.hairline,
   },
   questionCopy: {
     gap: spacing.sm,
@@ -1914,10 +1943,10 @@ const styles = StyleSheet.create({
   },
   sceneSurface: {
     backgroundColor: colors.surface,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.hairline,
-    borderRadius: 28,
-    paddingVertical: spacing.sm,
+    borderRadius: 30,
+    paddingVertical: spacing.base,
     paddingHorizontal: spacing.base,
   },
   sceneCaption: {

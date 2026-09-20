@@ -117,6 +117,19 @@ Current code-level visual system:
 
 Discovery cards use dedicated topic visuals when available. Mechanism illustrations sit on quiet bounded surfaces while explanatory text remains dominant.
 
+### Visual craft pass v2
+
+The approved visual references are treated as a specification for craft, not as loose inspiration.
+
+Implementation rules:
+- navigation and learning-action icons use filled, recognizable silhouettes with strong color fields and dark outlines
+- color is allowed to occupy meaningful shape area; avoid reducing the palette to tiny accent strokes
+- topic visuals are free-standing illustrations rather than generic gray icon tiles
+- discovery pages use editorial rhythm, separators, generous whitespace and selective tinted blocks instead of stacking every object inside identical bordered cards
+- one visual family should feel coherent at 24px, 32px and 48px
+- mechanism illustrations should reveal structure, direction, layers or relationships, not decorate the lesson
+- Curio may learn composition principles from external DESIGN.md references, but must not copy another product's visual identity
+
 Bottom navigation is visible on discovery/home surfaces, where it supports orientation without interrupting the bounded learning flow. Today and Explore are functional in the current MVP. Review, Library and Profile may appear only as clearly disabled future destinations until those product areas exist. The Immersion itself keeps one dominant next action and does not show persistent primary navigation.
 
 ## Motion

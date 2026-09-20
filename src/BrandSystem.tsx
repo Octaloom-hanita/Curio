@@ -1,4 +1,4 @@
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 import { colors } from './theme';
 
 export function CurioMark({
@@ -15,38 +15,22 @@ export function CurioMark({
   const cutout = colors.canvas;
 
   return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      accessibilityElementsHidden
-      focusable={false}
-    >
-      <Circle cx="28" cy="32" r="24" fill={shell} />
-      <Circle cx="28" cy="32" r="12" fill={cutout} />
-      <Rect x="28" y="17" width="19" height="30" fill={cutout} />
-
-      <Path
-        d="M27 20 42 16v32l-15-4Z"
-        fill={purple}
-        stroke={shell}
-        strokeWidth="2.2"
-        strokeLinejoin="round"
-      />
-      <Path
-        d="M40 17 55 11v42l-15-5Z"
-        fill={orange}
-        stroke={shell}
-        strokeWidth="2.2"
-        strokeLinejoin="round"
-      />
-      <Path
-        d="m22 44 18 4-9 7-15-5Z"
-        fill={green}
-        stroke={shell}
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
+    <Svg width={size} height={size} viewBox="0 0 72 64" accessibilityElementsHidden focusable={false}>
+      <Defs>
+        <LinearGradient id="curioPurple" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor={mono ? colors.ink : '#8B59D6'} />
+          <Stop offset="1" stopColor={mono ? colors.ink : '#E7D4F8'} />
+        </LinearGradient>
+        <LinearGradient id="curioOrange" x1="0" y1="0" x2="0.9" y2="1">
+          <Stop offset="0" stopColor={mono ? colors.ink : colors.yellow} />
+          <Stop offset="1" stopColor={orange} />
+        </LinearGradient>
+      </Defs>
+      <Path d="M31 6C16 6 5 17 5 32s11 26 26 26V46c-8 0-14-6-14-14s6-14 14-14Z" fill={shell} />
+      <Circle cx="31" cy="32" r="10" fill={cutout} />
+      <Path d="M28 20 44 15v34l-16-5Z" fill={mono ? purple : 'url(#curioPurple)'} stroke={shell} strokeWidth="2.2" strokeLinejoin="round" />
+      <Path d="M42 17 61 10v44l-19-6Z" fill={mono ? orange : 'url(#curioOrange)'} stroke={shell} strokeWidth="2.4" strokeLinejoin="round" />
+      <Path d="m23 44 19 4-11 8-17-5Z" fill={green} stroke={shell} strokeWidth="2.1" strokeLinejoin="round" />
     </Svg>
   );
 }
