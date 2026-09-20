@@ -129,6 +129,41 @@ Avoid literal decorative illustrations that create ambiguity.
 
 The termite MVP therefore uses abstract airflow/temperature/cycle visuals instead of a literal termite-mound character.
 
+### Production visual asset families
+
+Current code-level visual system:
+- `src/IconSystem.tsx` - navigation, learning, audio/voice, feedback, utility and discovery icons
+- `src/IllustrationSystem.tsx` - mechanism illustrations, topic visuals and empty-state illustrations
+- `src/Visuals.tsx` - compatibility layer that maps learning-step scenes to the production illustration system
+
+Mechanism illustration set:
+- airflow
+- temperature difference
+- structural paths
+- decentralized/local interaction
+- daily cycle
+- recall
+- concept connection
+- completion
+
+Topic visual set:
+- Earth
+- life
+- brain
+- cognition
+- society
+- body
+- technology
+- science
+
+Empty-state set:
+- no reviews due
+- no saved items
+- coming soon
+- offline
+
+Visual assets should be implemented as reusable SVG-backed React Native components so the same source works on web now and native Expo later.
+
 ## Motion
 
 Motion should be subtle and explanatory.

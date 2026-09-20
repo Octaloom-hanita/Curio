@@ -60,6 +60,8 @@ Updated: 2026-09-20
 - Official logo direction: The Opening.
 - Official illustration principle: Reveal the mechanism.
 - Production visuals use reusable vector/component assets, not crops from concept boards.
+- The production asset taxonomy includes UI icons, mechanism illustrations, topic visuals and empty states.
+- Mechanism visuals for the termite slice distinguish airflow, temperature difference, structural paths, decentralized interaction and daily cycle instead of reusing one generic diagram.
 - Impeccable is the UI craft/critique workflow.
 - VoltAgent/awesome-design-md is a reference source, not a template to copy.
 - Large readable type.

@@ -39,14 +39,14 @@ const accentMap: Record<Accent, string> = {
 };
 
 const sceneMap: SceneName[] = [
-  'flow',
-  'flow',
-  'heat',
-  'flow',
-  'flow',
+  'airflow',
+  'airflow',
+  'temperature',
+  'structure',
+  'decentralized',
   'cycle',
   'cycle',
-  'flow',
+  'airflow',
   'recall',
   'connection',
   'complete',
@@ -465,7 +465,7 @@ export default function App() {
   const step = copy.steps[index];
   const kind = step.kind;
   const cta = 'cta' in step ? step.cta : undefined;
-  const scene = sceneMap[index] ?? 'flow';
+  const scene = sceneMap[index] ?? 'airflow';
   const accent = accentByStep[index] ?? 'green';
   const summaryIndex = 6;
   const connectionIndex = 9;
@@ -607,8 +607,12 @@ export default function App() {
                   <View style={styles.sceneBlock}>
                     <CurioScene name={scene} />
                     <AppText variant="meta" color="muted" style={styles.sceneCaption}>
-                      {scene === 'heat'
+                      {scene === 'temperature'
                         ? copy.sceneHeat
+                        : scene === 'structure'
+                        ? copy.sceneStructure
+                        : scene === 'decentralized'
+                        ? copy.sceneDecentralized
                         : scene === 'cycle'
                         ? copy.sceneCycle
                         : scene === 'connection'

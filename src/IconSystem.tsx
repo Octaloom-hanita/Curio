@@ -39,7 +39,10 @@ export type IconName =
   | 'book'
   | 'audio'
   | 'microscope'
-  | 'atom';
+  | 'atom'
+  | 'earth'
+  | 'body'
+  | 'technology';
 
 type IconProps = {
   name: IconName;
@@ -313,6 +316,32 @@ export function CurioIcon({
           <Path d="M33 15c6-7 16-4 16 5 7 1 8 12 1 15 4 8-5 17-17 12Z" {...s} />
           <Line x1="32" y1="15" x2="32" y2="47" {...s} />
           <Circle cx="23" cy="29" r="4" fill={accent} />
+        </>
+      )}
+
+
+      {name === 'earth' && (
+        <>
+          <Circle cx="32" cy="32" r="22" {...s} />
+          <Path d="M11 33c9-7 17-4 24 0 8 5 13 7 20 1" {...s} />
+          <Path d="M32 10c-7 8-10 15-10 22s3 15 10 22M32 10c7 8 10 15 10 22s-3 15-10 22" {...s} />
+          <Circle cx="47" cy="17" r="4" fill={accent} />
+        </>
+      )}
+
+      {name === 'body' && (
+        <>
+          <Circle cx="32" cy="18" r="8" {...s} />
+          <Path d="M32 26v18M20 34l12 6 12-6M25 54l7-10 7 10" {...s} />
+          <Line x1="15" y1="54" x2="49" y2="54" stroke={accent} strokeWidth={4} strokeLinecap="round" />
+        </>
+      )}
+
+      {name === 'technology' && (
+        <>
+          <Rect x="17" y="17" width="30" height="30" rx="7" {...s} />
+          <Rect x="25" y="25" width="14" height="14" rx="4" fill={accent} stroke={color} strokeWidth={strokeWidth} />
+          <Path d="M23 10v7M32 10v7M41 10v7M23 47v7M32 47v7M41 47v7M10 23h7M10 32h7M10 41h7M47 23h7M47 32h7M47 41h7" {...s} />
         </>
       )}
 
