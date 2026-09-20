@@ -30,11 +30,11 @@ export const ui = {
         cta: 'Начать',
       },
       {
-        kind: 'hypothesis',
-        eyebrow: 'СНАЧАЛА ВАША ГИПОТЕЗА',
-        title: 'Что заставляет воздух двигаться внутри термитника?',
-        body: ['Здесь нет оценки. Сначала зафиксируем вашу мысль, а затем сравним её с наблюдениями исследователей.'],
-        cta: 'Продолжить',
+        kind: 'learn',
+        eyebrow: 'СНАЧАЛА КОНТЕКСТ',
+        title: 'Зачем гнезду вообще нужен обмен воздуха?',
+        body: ['Внутри большой колонии постоянно идёт обмен газов: организмы потребляют кислород и выделяют углекислый газ.', 'Поэтому вопрос не в том, нужен ли воздухообмен, а в том, как воздух движется через структуру без вентилятора и центрального управления.'],
+        cta: 'Дальше',
       },
       {
         kind: 'note',
@@ -115,11 +115,11 @@ export const ui = {
         cta: 'Start',
       },
       {
-        kind: 'hypothesis',
-        eyebrow: 'START WITH YOUR HYPOTHESIS',
-        title: 'What makes air move inside a termite mound?',
-        body: ['There is no score here. First capture your idea, then compare it with what researchers observed.'],
-        cta: 'Continue',
+        kind: 'learn',
+        eyebrow: 'START WITH CONTEXT',
+        title: 'Why does a nest need air exchange at all?',
+        body: ['Inside a large colony, organisms continuously consume oxygen and release carbon dioxide.', 'So the question is not whether air exchange is needed, but how air moves through the structure without a fan or central controller.'],
+        cta: 'Next',
       },
       {
         kind: 'note',
