@@ -79,7 +79,7 @@ export const ui = {
         title: 'Центрального инженера нет',
         body: [
           'Никто не управляет воздушным потоком в реальном времени.',
-          'Форма, локальные действия термитов и физические условия вместе создают систему, которая может работать без единого центра управления.',
+          'Термиты строят и изменяют структуру через множество локальных действий, но никто из них не управляет воздушным потоком. Физические условия и сама структура вместе создают циркуляцию.',
         ],
         cta: 'Дальше',
       },
@@ -221,7 +221,7 @@ export const ui = {
         title: 'There is no central engineer',
         body: [
           'No individual termite controls the airflow in real time.',
-          'Shape, local termite activity, and physical conditions combine into a system that can work without a single control center.',
+          'Termites build and modify the structure through many local actions, but no individual controls the airflow. Physical conditions and the structure together produce the circulation.',
         ],
         cta: 'Next',
       },
