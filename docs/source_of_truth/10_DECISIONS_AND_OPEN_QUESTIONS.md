@@ -57,6 +57,11 @@ Updated: 2026-09-20
 - Current browser-local persistence is temporary.
 
 ### Design
+- Official logo direction: The Opening.
+- Official illustration principle: Reveal the mechanism.
+- Production visuals use reusable vector/component assets.
+- Impeccable is the UI craft/critique workflow.
+- VoltAgent/awesome-design-md is a reference source, not a template to copy.
 - Large readable type.
 - Stronger Curio color system.
 - Illustrations support mechanisms.
