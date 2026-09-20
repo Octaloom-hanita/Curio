@@ -19,7 +19,6 @@ const MISCONCEPTIONS = {
 
 const schema = {
   type: 'object',
-  additionalProperties: false,
   properties: {
     coveredPoints: {
       type: 'array',
