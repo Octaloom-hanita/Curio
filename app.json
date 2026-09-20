@@ -7,7 +7,7 @@
     "userInterfaceStyle": "light",
     "web": {
       "bundler": "metro",
-      "output": "static"
+      "output": "single"
     }
   }
 }
