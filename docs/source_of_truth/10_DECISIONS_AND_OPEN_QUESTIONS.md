@@ -115,14 +115,23 @@ The following older ideas are no longer canonical:
 
 Do not add many random topics directly to code.
 
-The first balanced Content DB schema and seed are now prepared in the repository.
+The first balanced Content DB schema and seed are now live in Supabase and versioned in the repository.
+
+Initial QA confirmed:
+- 18 content tables
+- RLS enabled on every content table
+- 8 discovery areas
+- 30 bilingual questions
+- 23 first-wave concepts
+- 6 first-wave Immersion skeletons
+- 8 project source records
+- 0 approved Immersions, intentionally
 
 Next:
-1. Connect the Supabase project.
-2. Apply the content migration and seed.
-3. QA counts, RLS and bilingual reads.
-4. Continue claim-level source mapping and editorial review for the first six Immersions.
-5. Add learning/user persistence in a later migration after the anonymous-vs-account-first decision.
-6. Only then replace hard-coded catalog/discovery data in the app.
+1. Continue claim-level source mapping and editorial review for the first six Immersions.
+2. Decide anonymous first use vs account required.
+3. Add learning/user persistence in a later migration.
+4. Wire approved catalog/discovery data into the app.
+5. Keep draft/review content inaccessible to public client reads.
 
 Microphone and ElevenLabs continue after the content/persistence foundation is stable.
