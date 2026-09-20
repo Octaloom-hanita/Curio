@@ -117,6 +117,8 @@ Current code-level visual system:
 
 Discovery cards use dedicated topic visuals when available. Mechanism illustrations sit on quiet bounded surfaces while explanatory text remains dominant.
 
+Bottom navigation is visible on discovery/home surfaces, where it supports orientation without interrupting the bounded learning flow. Today and Explore are functional in the current MVP. Review, Library and Profile may appear only as clearly disabled future destinations until those product areas exist. The Immersion itself keeps one dominant next action and does not show persistent primary navigation.
+
 ## Motion
 
 Motion should be subtle and explanatory.
