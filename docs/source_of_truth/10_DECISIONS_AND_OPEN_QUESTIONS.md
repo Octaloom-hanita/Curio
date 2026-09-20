@@ -36,6 +36,9 @@ Updated: 2026-09-20
 - Brain/neuroscience and cognition/learning are major pillars alongside Earth, life, society, body, technology and systems.
 - Professions/fields are a discovery lens in v1, not a dedicated core database entity.
 - The first curated database seed contains 30 bilingual questions and 6 balanced Immersion skeletons.
+- Discovery is broader than publication: curated question/book/phenomenon metadata may be browsable while full Immersions remain gated.
+- Current discovery sequence is Featured Questions -> Areas -> Books -> Phenomena.
+- Books open questions; they are not presented as book-summary products.
 
 ### AI
 - Current evaluation provider is Gemini through Vercel server-side code.
@@ -53,8 +56,9 @@ Updated: 2026-09-20
 - Never evaluate unconfirmed STT output.
 
 ### Data
-- Supabase is the planned backend for Postgres/Auth/Storage.
-- Current browser-local persistence is temporary.
+- Supabase is live for the content catalog, source/content records and audio-asset foundation.
+- Supabase remains the planned backend for Auth and learner persistence.
+- Current learner progress persistence in the browser is temporary.
 
 ### Design
 - Official logo direction: The Opening.
@@ -134,11 +138,20 @@ Initial QA confirmed:
 - 8 project source records
 - 0 approved Immersions, intentionally
 
-Next:
-1. Continue claim-level source mapping and editorial review for the first six Immersions.
-2. Decide anonymous first use vs account required.
-3. Add learning/user persistence in a later migration.
-4. Wire approved catalog/discovery data into the app.
-5. Keep draft/review content inaccessible to public client reads.
+Current discovery/content state:
+- 8 discovery areas are browsable
+- 31 curated discovery questions are visible (30-question seed + termite reference question)
+- 8 project books are visible as discovery/research objects
+- 1 phenomenon is currently mapped
+- 1 full Immersion (termite reference) is approved
+- B01 attention/inattentional-blindness is evidence-verified but remains ai_generated pending owner/editorial approval
+- Chrome voice record -> transcribe -> edit -> confirm -> evaluate is implemented
+- ElevenLabs generation/storage foundation is implemented; playback remains pending
 
-Microphone and ElevenLabs continue after the content/persistence foundation is stable.
+Next:
+1. Validate the new Today/Explore discovery experience with the first user.
+2. Complete editorial approval of B01 before publishing or generating TTS from it.
+3. Add audio playback for ready audio assets.
+4. Decide anonymous first use vs account required.
+5. Add learner/progress/review persistence in a later migration.
+6. Keep explanatory content, rubrics and learning steps gated until approval.

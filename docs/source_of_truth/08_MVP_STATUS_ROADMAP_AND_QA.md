@@ -8,7 +8,9 @@ Production web MVP is deployed on Vercel.
 
 Working:
 - RU / EN UI
-- topic selection
+- bounded Today surface
+- Explore surface with featured questions, all 8 discovery areas, 8 research books and phenomena
+- category browsing with curated question maps
 - accessible large typography
 - text-size control
 - guided learning flow
@@ -20,6 +22,10 @@ Working:
 - retry
 - return to explanation
 - bounded session ending
+- Chrome microphone recording
+- server-side transcription
+- editable transcript + explicit confirmation before evaluation
+- Supabase-backed discovery/catalog reads
 - TypeScript build gate
 
 ## AI QA status
@@ -71,25 +77,30 @@ Initial candidates:
 
 ### P1 - Audio
 
-Implement ElevenLabs for approved Curio text:
-- generate
-- store
-- play
-- pause
+Foundation implemented:
+- gated server-side ElevenLabs generation endpoint
+- approved-text-only generation rule
+- Supabase Storage bucket and versioned audio asset records
+
+Still required:
+- generate and verify the first production audio asset
+- play / pause
 - seek
 - speed
 - resume
-- error handling
+- playback error handling
 
 ### P1 - Voice
 
-Chrome microphone:
+Implemented in the Chrome web flow:
 - record
-- upload
+- upload to the server endpoint
 - transcribe
 - editable transcript
 - explicit confirmation
-- evaluate
+- evaluate only after confirmation
+
+Provider quality/privacy decisions remain open; Gemini audio transcription is a current implementation for testing, not a permanent provider decision.
 
 ### P1 - Persistence and review
 
@@ -127,8 +138,8 @@ Current build is appropriate for:
 - content-flow validation
 
 It is not yet a full private alpha of the intended product because:
-- audio is not live
-- microphone/transcription is not live
-- server persistence is not live
+- TTS playback is not live
+- server-side learner persistence is not live
 - delayed review is not live
-- content breadth is still minimal
+- only one full Immersion is approved for public learning
+- most discovery questions intentionally expose metadata before their full learning experiences are approved

@@ -24,6 +24,31 @@ type QuestionRow = {
   prompt_ru: string;
   prompt_en: string;
   difficulty: number;
+  discover_rank?: number | null;
+};
+
+type BookRow = {
+  id: string;
+  title: string;
+  publication_year: number | null;
+  discovery_author_text: string | null;
+  discovery_blurb_ru: string | null;
+  discovery_blurb_en: string | null;
+  sort_order: number;
+};
+
+type PhenomenonRow = {
+  id: string;
+  category_id: string | null;
+  title_ru: string;
+  title_en: string;
+  description_ru: string | null;
+  description_en: string | null;
+};
+
+type BookQuestionRow = {
+  book_id: string;
+  question_id: string;
 };
 
 type ImmersionRow = {
@@ -47,6 +72,37 @@ type ImmersionStepRow = {
   body_ru: unknown;
   body_en: unknown;
   question_id: string | null;
+};
+
+export type DiscoveryQuestionItem = {
+  id: string;
+  categoryId: string;
+  rank: number;
+  ru: string;
+  en: string;
+};
+
+export type DiscoveryBook = {
+  id: string;
+  title: string;
+  author: string;
+  year?: number;
+  questionCount: number;
+  ru: string;
+  en: string;
+};
+
+export type DiscoveryPhenomenon = {
+  id: string;
+  categoryId: string;
+  ru: { title: string; description: string };
+  en: { title: string; description: string };
+};
+
+export type DiscoveryHome = {
+  featuredQuestions: DiscoveryQuestionItem[];
+  books: DiscoveryBook[];
+  phenomena: DiscoveryPhenomenon[];
 };
 
 export type LessonStep = {
@@ -194,6 +250,72 @@ export async function loadApprovedCatalog(): Promise<Topic[]> {
   } catch (error) {
     console.warn('Could not load approved Curio catalog from Supabase.', error);
     return [];
+  }
+}
+
+export async function loadDiscoveryHome(): Promise<DiscoveryHome> {
+  const empty: DiscoveryHome = {
+    featuredQuestions: [],
+    books: [],
+    phenomena: [],
+  };
+
+  try {
+    const [questionRows, bookRows, phenomenonRows, bookQuestionRows] =
+      await Promise.all([
+        readApprovedRows<QuestionRow>(
+          'questions?discover_rank=not.is.null&select=id,category_id,prompt_ru,prompt_en,difficulty,discover_rank&order=discover_rank.asc'
+        ),
+        readApprovedRows<BookRow>(
+          'books?is_discoverable=eq.true&select=id,title,publication_year,discovery_author_text,discovery_blurb_ru,discovery_blurb_en,sort_order&order=sort_order.asc'
+        ),
+        readApprovedRows<PhenomenonRow>(
+          'phenomena?is_discoverable=eq.true&select=id,category_id,title_ru,title_en,description_ru,description_en&order=id.asc'
+        ),
+        readApprovedRows<BookQuestionRow>(
+          'book_questions?select=book_id,question_id'
+        ),
+      ]);
+
+    const questionCountByBook = new Map<string, number>();
+    for (const link of bookQuestionRows) {
+      questionCountByBook.set(
+        link.book_id,
+        (questionCountByBook.get(link.book_id) ?? 0) + 1
+      );
+    }
+
+    return {
+      featuredQuestions: questionRows
+        .filter((row) => Boolean(row.category_id) && typeof row.discover_rank === 'number')
+        .map((row) => ({
+          id: row.id,
+          categoryId: row.category_id!,
+          rank: row.discover_rank!,
+          ru: row.prompt_ru,
+          en: row.prompt_en,
+        })),
+      books: bookRows.map((row) => ({
+        id: row.id,
+        title: row.title,
+        author: row.discovery_author_text ?? '',
+        year: row.publication_year ?? undefined,
+        questionCount: questionCountByBook.get(row.id) ?? 0,
+        ru: row.discovery_blurb_ru ?? '',
+        en: row.discovery_blurb_en ?? '',
+      })),
+      phenomena: phenomenonRows
+        .filter((row) => Boolean(row.category_id))
+        .map((row) => ({
+          id: row.id,
+          categoryId: row.category_id!,
+          ru: { title: row.title_ru, description: row.description_ru ?? '' },
+          en: { title: row.title_en, description: row.description_en ?? '' },
+        })),
+    };
+  } catch (error) {
+    console.warn('Could not load Curio discovery home from Supabase.', error);
+    return empty;
   }
 }
 
