@@ -31,10 +31,18 @@ import {
   type TopicVisualName,
 } from './src/Visuals';
 import { topics as fallbackTopics, type Topic } from './src/topics';
-import { loadApprovedCatalog, loadApprovedImmersionSteps, type LessonStep } from './src/contentRepository';
+import {
+  loadApprovedCatalog,
+  loadApprovedImmersionSteps,
+  loadDiscoveryHome,
+  type DiscoveryHome,
+  type DiscoveryQuestionItem,
+  type DiscoveryPhenomenon,
+  type LessonStep,
+} from './src/contentRepository';
 
 type Accent = 'orange' | 'green' | 'purple' | 'blue' | 'yellow';
-type Screen = 'home' | 'category' | 'lesson';
+type Screen = 'home' | 'explore' | 'category' | 'lesson';
 
 const accentMap: Record<Accent, string> = {
   orange: colors.orange,
@@ -295,7 +303,6 @@ function TopicCard({
   onPress: () => void;
 }) {
   const copy = topic[locale];
-  const uiCopy = ui[locale];
   const visualName = topicVisualByIcon[topic.icon];
 
   return (
@@ -325,14 +332,9 @@ function TopicCard({
       <View style={styles.topicCopy}>
         <View style={styles.topicHeader}>
           <AppText variant="title">{copy.title}</AppText>
-          <View
-            style={[
-              styles.statusPill,
-              topic.ready ? styles.statusReady : styles.statusSoon,
-            ]}
-          >
+          <View style={[styles.statusPill, styles.statusNeutral]}>
             <AppText variant="meta">
-              {topic.ready ? uiCopy.ready : uiCopy.soon}
+              {topic.questions?.length ?? 0} {locale === 'ru' ? 'вопросов' : 'questions'}
             </AppText>
           </View>
         </View>
@@ -341,60 +343,269 @@ function TopicCard({
           {copy.description}
         </AppText>
 
-        <View style={styles.firstLessonRow}>
-          <AppText variant="label">
-            {locale === 'ru' ? 'Первое исследование:' : 'First exploration:'}
-          </AppText>
-          <AppText variant="bodySmall">{copy.first}</AppText>
-        </View>
       </View>
     </Pressable>
   );
 }
 
-function HomeScreen({
+function DiscoveryQuestionCard({
+  question,
   locale,
   topics,
-  onSelect,
+  onPress,
+}: {
+  question: DiscoveryQuestionItem;
+  locale: Locale;
+  topics: Topic[];
+  onPress: () => void;
+}) {
+  const topic = topics.find((item) => item.id === question.categoryId);
+  const mappedQuestion = topic?.questions?.find((item) => item.id === question.id);
+  const ready = Boolean(mappedQuestion?.immersionId);
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.discoveryQuestionCard,
+        pressed && { opacity: 0.82 },
+      ]}
+    >
+      <View style={styles.discoveryQuestionMeta}>
+        <CurioIcon
+          name={topic?.icon ?? 'bulb'}
+          size={28}
+          color={colors.ink}
+          accent={topic ? accentMap[topic.color] : colors.yellow}
+        />
+        <AppText variant="meta" color="muted">
+          {topic?.[locale].title ?? (locale === 'ru' ? 'Вопрос Curio' : 'Curio question')}
+        </AppText>
+      </View>
+      <AppText variant="title">{question[locale]}</AppText>
+      <AppText variant="meta" color="muted">
+        {ready
+          ? locale === 'ru'
+            ? 'Полное исследование готово'
+            : 'Full exploration ready'
+          : locale === 'ru'
+          ? 'Открыть область и связанные вопросы'
+          : 'Open the area and related questions'}
+      </AppText>
+    </Pressable>
+  );
+}
+
+function TodayScreen({
+  locale,
+  topics,
+  discovery,
+  onQuestionSelect,
   hasSession,
   onResume,
+  onExplore,
 }: {
   locale: Locale;
   topics: Topic[];
-  onSelect: (topic: Topic) => void;
+  discovery: DiscoveryHome;
+  onQuestionSelect: (question: DiscoveryQuestionItem) => void;
   hasSession: boolean;
   onResume: () => void;
+  onExplore: () => void;
 }) {
   const copy = ui[locale];
-
-  const select = (topic: Topic) => {
-    onSelect(topic);
-  };
+  const firstQuestion = discovery.featuredQuestions[0];
 
   return (
     <>
       <View style={styles.homeIntro}>
         <AppText variant="display" serif>
-          {copy.chooseTopicTitle}
+          {locale === 'ru' ? 'Сегодня в Curio' : 'Today in Curio'}
         </AppText>
         <AppText variant="body" color="muted">
-          {copy.chooseTopicBody}
+          {locale === 'ru'
+            ? 'Один понятный следующий шаг. Продолжите начатое или разберите один хороший вопрос.'
+            : 'One clear next step. Continue where you left off or explore one strong question.'}
         </AppText>
       </View>
 
-      {hasSession && (
+      {hasSession ? (
         <View style={styles.resumeCard}>
           <View style={styles.resumeCopy}>
             <AppText variant="title">{copy.resumeTitle}</AppText>
+            <AppText variant="bodySmall" color="muted">{copy.resumeBody}</AppText>
+          </View>
+          <PrimaryButton label={copy.resumeAction} onPress={onResume} accent="green" />
+        </View>
+      ) : firstQuestion ? (
+        <View style={styles.todayQuestion}>
+          <AppText variant="meta" color="muted">
+            {locale === 'ru' ? 'ВОПРОС ДНЯ' : 'QUESTION FOR TODAY'}
+          </AppText>
+          <DiscoveryQuestionCard
+            question={firstQuestion}
+            locale={locale}
+            topics={topics}
+            onPress={() => onQuestionSelect(firstQuestion)}
+          />
+        </View>
+      ) : null}
+
+      <View style={styles.todayExplore}>
+        <AppText variant="headline">
+          {locale === 'ru' ? 'Хотите выбрать сами?' : 'Want to choose for yourself?'}
+        </AppText>
+        <AppText variant="bodySmall" color="muted">
+          {locale === 'ru'
+            ? 'Перейдите в «Исследовать»: там вопросы, области, книги и явления.'
+            : 'Open Explore for questions, areas, books, and phenomena.'}
+        </AppText>
+        <PrimaryButton
+          label={locale === 'ru' ? 'Исследовать' : 'Explore'}
+          onPress={onExplore}
+          accent="orange"
+        />
+      </View>
+    </>
+  );
+}
+
+function ExploreScreen({
+  locale,
+  topics,
+  discovery,
+  onSelect,
+  onQuestionSelect,
+  onPhenomenonSelect,
+}: {
+  locale: Locale;
+  topics: Topic[];
+  discovery: DiscoveryHome;
+  onSelect: (topic: Topic) => void;
+  onQuestionSelect: (question: DiscoveryQuestionItem) => void;
+  onPhenomenonSelect: (phenomenon: DiscoveryPhenomenon) => void;
+}) {
+  return (
+    <>
+      <View style={styles.homeIntro}>
+        <AppText variant="display" serif>{locale === 'ru' ? 'Исследовать' : 'Explore'}</AppText>
+        <AppText variant="body" color="muted">
+          {locale === 'ru'
+            ? 'Начните с вопроса, области, книги или реального явления. Curio ведёт от любопытства к механизму.'
+            : 'Start with a question, an area, a book, or a real phenomenon. Curio moves from curiosity to mechanism.'}
+        </AppText>
+      </View>
+
+      <View style={styles.discoverySection}>
+        <View style={styles.discoverySectionHeader}>
+          <AppText variant="headline">
+            {locale === 'ru' ? 'Вопросы, которые стоит исследовать' : 'Questions worth exploring'}
+          </AppText>
+          <AppText variant="bodySmall" color="muted">
+            {locale === 'ru' ? 'Короткие входы в большие механизмы.' : 'Short entry points into bigger mechanisms.'}
+          </AppText>
+        </View>
+        <View style={styles.discoveryList}>
+          {discovery.featuredQuestions.map((question) => (
+            <DiscoveryQuestionCard
+              key={question.id}
+              question={question}
+              locale={locale}
+              topics={topics}
+              onPress={() => onQuestionSelect(question)}
+            />
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.discoverySection}>
+        <View style={styles.discoverySectionHeader}>
+          <AppText variant="headline">{locale === 'ru' ? 'Исследовать по области' : 'Explore by area'}</AppText>
+          <AppText variant="bodySmall" color="muted">
+            {locale === 'ru'
+              ? 'Все области открываются. Внутри уже видна карта вопросов, даже если полное исследование ещё проходит проверку.'
+              : 'Every area opens. Its question map is visible even when the full exploration is still under review.'}
+          </AppText>
+        </View>
+        <View style={styles.topicList}>
+          {topics.map((topic) => (
+            <TopicCard key={topic.id} topic={topic} locale={locale} onPress={() => onSelect(topic)} />
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.discoverySection}>
+        <View style={styles.discoverySectionHeader}>
+          <AppText variant="headline">
+            {locale === 'ru' ? 'Книги, которые открывают вопросы' : 'Books that open new questions'}
+          </AppText>
+          <AppText variant="bodySmall" color="muted">
+            {locale === 'ru'
+              ? 'Книги здесь - точки входа и исследовательские источники, а не готовые пересказы.'
+              : 'Books are discovery and research objects here, not ready-made summaries.'}
+          </AppText>
+        </View>
+        <View style={styles.discoveryList}>
+          {discovery.books.map((book) => (
+            <View key={book.id} style={styles.bookCard}>
+              <View style={styles.bookCardTop}>
+                <CurioIconBadge
+                  name="book"
+                  size={52}
+                  iconSize={28}
+                  background={colors.surfaceSoft}
+                  color={colors.ink}
+                  accent={colors.orange}
+                />
+                <View style={styles.bookCardHeading}>
+                  <AppText variant="title">{book.title}</AppText>
+                  <AppText variant="meta" color="muted">
+                    {[book.author, book.year ? String(book.year) : ''].filter(Boolean).join(' · ')}
+                  </AppText>
+                </View>
+              </View>
+              <AppText variant="bodySmall">{book[locale]}</AppText>
+              <AppText variant="meta" color="muted">
+                {book.questionCount > 0
+                  ? locale === 'ru'
+                    ? `${book.questionCount} связанных вопросов Curio`
+                    : `${book.questionCount} connected Curio questions`
+                  : locale === 'ru'
+                  ? 'Связи с вопросами ещё картируются'
+                  : 'Question links are still being mapped'}
+              </AppText>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {discovery.phenomena.length > 0 && (
+        <View style={styles.discoverySection}>
+          <View style={styles.discoverySectionHeader}>
+            <AppText variant="headline">{locale === 'ru' ? 'Явления' : 'Phenomena'}</AppText>
             <AppText variant="bodySmall" color="muted">
-              {copy.resumeBody}
+              {locale === 'ru'
+                ? 'Наблюдаемые эффекты, через которые удобно раскрывать механизм.'
+                : 'Observable effects that make a mechanism easier to see.'}
             </AppText>
           </View>
-          <PrimaryButton
-            label={copy.resumeAction}
-            onPress={onResume}
-            accent="green"
-          />
+          <View style={styles.discoveryList}>
+            {discovery.phenomena.map((phenomenon) => (
+              <Pressable
+                key={phenomenon.id}
+                accessibilityRole="button"
+                onPress={() => onPhenomenonSelect(phenomenon)}
+                style={({ pressed }) => [styles.phenomenonCard, pressed && { opacity: 0.82 }]}
+              >
+                <CurioIcon name="microscope" size={32} color={colors.ink} accent={colors.purple} />
+                <View style={styles.phenomenonCopy}>
+                  <AppText variant="title">{phenomenon[locale].title}</AppText>
+                  <AppText variant="bodySmall" color="muted">{phenomenon[locale].description}</AppText>
+                </View>
+              </Pressable>
+            ))}
+          </View>
         </View>
       )}
 
@@ -408,25 +619,16 @@ function HomeScreen({
           accent={colors.orange}
         />
         <View style={styles.honestyCopy}>
-          <AppText variant="bodySmall">{copy.onlyOneReady}</AppText>
+          <AppText variant="bodySmall">
+            {locale === 'ru'
+              ? 'Полные исследования становятся доступными только после научной и редакционной проверки.'
+              : 'Full explorations become available only after scientific and editorial review.'}
+          </AppText>
         </View>
       </View>
-
-      <View style={styles.topicList}>
-        {topics.map((topic) => (
-          <TopicCard
-            key={topic.id}
-            topic={topic}
-            locale={locale}
-            onPress={() => select(topic)}
-          />
-        ))}
-      </View>
-
     </>
   );
 }
-
 
 function CategoryScreen({
   topic,
@@ -604,6 +806,11 @@ export default function App() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const [catalogTopics, setCatalogTopics] = useState<Topic[]>(fallbackTopics);
+  const [discoveryHome, setDiscoveryHome] = useState<DiscoveryHome>({
+    featuredQuestions: [],
+    books: [],
+    phenomena: [],
+  });
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [lessonSteps, setLessonSteps] = useState<LessonStep[]>([]);
   const [activeImmersionId, setActiveImmersionId] = useState('immersion_termite_reference');
@@ -667,11 +874,15 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
 
-    loadApprovedCatalog().then((remoteTopics) => {
-      if (!cancelled && remoteTopics.length > 0) {
-        setCatalogTopics(remoteTopics);
+    Promise.all([loadApprovedCatalog(), loadDiscoveryHome()]).then(
+      ([remoteTopics, remoteDiscovery]) => {
+        if (cancelled) return;
+        if (remoteTopics.length > 0) {
+          setCatalogTopics(remoteTopics);
+        }
+        setDiscoveryHome(remoteDiscovery);
       }
-    });
+    );
 
     return () => {
       cancelled = true;
@@ -719,11 +930,8 @@ export default function App() {
 
   const goExplore = () => {
     resetEvaluation();
-    if (selectedTopic) {
-      setScreen('category');
-      return;
-    }
-    setScreen('home');
+    setSelectedTopic(null);
+    setScreen('explore');
   };
 
   const loadLesson = async (immersionId: string) => {
@@ -737,6 +945,27 @@ export default function App() {
     setSelectedTopic(topic);
     setScreen('category');
     resetEvaluation();
+  };
+
+  const openDiscoveryQuestion = (question: DiscoveryQuestionItem) => {
+    const topic = catalogTopics.find((item) => item.id === question.categoryId);
+    const mappedQuestion = topic?.questions?.find((item) => item.id === question.id);
+
+    if (mappedQuestion?.immersionId) {
+      void startImmersion(mappedQuestion.immersionId);
+      return;
+    }
+
+    if (topic) {
+      openCategory(topic);
+    }
+  };
+
+  const openDiscoveryPhenomenon = (phenomenon: DiscoveryPhenomenon) => {
+    const topic = catalogTopics.find((item) => item.id === phenomenon.categoryId);
+    if (topic) {
+      openCategory(topic);
+    }
   };
 
   const startImmersion = async (immersionId: string) => {
@@ -978,18 +1207,29 @@ export default function App() {
             />
 
             {screen === 'home' ? (
-              <HomeScreen
+              <TodayScreen
                 locale={locale}
                 topics={catalogTopics}
-                onSelect={openCategory}
+                discovery={discoveryHome}
+                onQuestionSelect={openDiscoveryQuestion}
                 hasSession={hasSession}
                 onResume={resumeLesson}
+                onExplore={goExplore}
+              />
+            ) : screen === 'explore' ? (
+              <ExploreScreen
+                locale={locale}
+                topics={catalogTopics}
+                discovery={discoveryHome}
+                onSelect={openCategory}
+                onQuestionSelect={openDiscoveryQuestion}
+                onPhenomenonSelect={openDiscoveryPhenomenon}
               />
             ) : screen === 'category' && selectedTopic ? (
               <CategoryScreen
                 topic={selectedTopic}
                 locale={locale}
-                onBack={goHome}
+                onBack={goExplore}
                 onStartImmersion={startImmersion}
               />
             ) : (
@@ -1526,9 +1766,79 @@ const styles = StyleSheet.create({
   statusSoon: {
     backgroundColor: colors.surfaceSoft,
   },
+  statusNeutral: {
+    backgroundColor: colors.surfaceSoft,
+  },
   firstLessonRow: {
     gap: 2,
     marginTop: spacing.xs,
+  },
+  discoverySection: {
+    gap: spacing.base,
+    marginBottom: spacing.xxl,
+  },
+  discoverySectionHeader: {
+    gap: spacing.xs,
+  },
+  discoveryList: {
+    gap: spacing.base,
+  },
+  discoveryQuestionCard: {
+    gap: spacing.sm,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  discoveryQuestionMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  todayQuestion: {
+    gap: spacing.sm,
+    marginBottom: spacing.xl,
+  },
+  todayExplore: {
+    gap: spacing.md,
+    padding: spacing.lg,
+    marginBottom: spacing.xxl,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  bookCard: {
+    gap: spacing.md,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.hairline,
+    borderRadius: radius.surface,
+  },
+  bookCardTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  bookCardHeading: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  phenomenonCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  phenomenonCopy: {
+    flex: 1,
+    gap: spacing.xs,
   },
   categoryHero: {
     flexDirection: 'row',

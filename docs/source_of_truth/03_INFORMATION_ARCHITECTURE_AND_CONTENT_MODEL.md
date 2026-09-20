@@ -10,14 +10,30 @@ Long-term primary navigation:
 - Библиотека - saved and ongoing learning
 - Profile/settings via avatar
 
-The current MVP uses a reduced topic-first navigation.
+The current MVP now exposes a bounded **Today** surface and a separate **Explore** surface. Review and Library remain future surfaces until their underlying learning state is real.
 
 ## Explore
+
+Current MVP discovery order:
+1. Featured questions
+2. Areas
+3. Books that open questions
+4. Phenomena
+
+Discovery metadata may be visible before a full learning experience is publishable. This is intentional: a learner may browse a curated question, book or phenomenon while the corresponding Immersion remains gated until scientific and editorial approval.
 
 Explore supports:
 
 ### Books
-Browse by category, author, topic, difficulty and content depth.
+Books are discovery/research objects, not summary containers.
+
+Current MVP book cards show:
+- title
+- author/year
+- an original Curio discovery blurb
+- how many curated Curio questions are currently mapped to the book
+
+Future browsing can add category, author, topic, difficulty and content depth.
 
 ### Topics
 Topic pages can contain:
