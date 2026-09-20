@@ -18,10 +18,19 @@ type CategoryRow = {
   sort_order: number;
 };
 
+type QuestionRow = {
+  id: string;
+  category_id: string | null;
+  prompt_ru: string;
+  prompt_en: string;
+  difficulty: number;
+};
+
 type ImmersionRow = {
   id: string;
   category_id: string | null;
   topic_id: string | null;
+  primary_question_id: string | null;
   title_ru: string;
   title_en: string;
   summary_ru: string | null;
@@ -122,18 +131,22 @@ function appKind(stepType: string): LessonStep['kind'] {
 
 export async function loadApprovedCatalog(): Promise<Topic[]> {
   try {
-    const [categoryRows, immersionRows] = await Promise.all([
+    const [categoryRows, questionRows, immersionRows] = await Promise.all([
       readApprovedRows<CategoryRow>(
         'categories?select=id,title_ru,title_en,description_ru,description_en,sort_order&order=sort_order.asc'
       ),
+      readApprovedRows<QuestionRow>(
+        'questions?is_discoverable=eq.true&select=id,category_id,prompt_ru,prompt_en,difficulty&order=difficulty.asc,id.asc'
+      ),
       readApprovedRows<ImmersionRow>(
-        'immersions?select=id,category_id,topic_id,title_ru,title_en,summary_ru,summary_en,sort_order&order=sort_order.asc'
+        'immersions?select=id,category_id,topic_id,primary_question_id,title_ru,title_en,summary_ru,summary_en,sort_order&order=sort_order.asc'
       ),
     ]);
 
     if (categoryRows.length === 0) return [];
 
     const firstImmersionByCategory = new Map<string, ImmersionRow>();
+    const immersionByQuestion = new Map<string, ImmersionRow>();
 
     for (const immersion of immersionRows) {
       if (
@@ -142,15 +155,27 @@ export async function loadApprovedCatalog(): Promise<Topic[]> {
       ) {
         firstImmersionByCategory.set(immersion.category_id, immersion);
       }
+      if (immersion.primary_question_id) {
+        immersionByQuestion.set(immersion.primary_question_id, immersion);
+      }
     }
 
     return categoryRows.map((row) => {
       const firstImmersion = firstImmersionByCategory.get(row.id);
+      const questions = questionRows
+        .filter((question) => question.category_id === row.id)
+        .map((question) => ({
+          id: question.id,
+          immersionId: immersionByQuestion.get(question.id)?.id,
+          ru: question.prompt_ru,
+          en: question.prompt_en,
+        }));
       const presentation = presentationByArea[row.id] ?? fallbackPresentation;
 
       return {
         id: row.id,
         immersionId: firstImmersion?.id,
+        questions,
         icon: presentation.icon,
         color: presentation.color,
         ready: Boolean(firstImmersion),
