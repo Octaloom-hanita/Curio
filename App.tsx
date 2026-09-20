@@ -22,7 +22,7 @@ import {
 import { AppText, AppTextScaleProvider } from './src/AppText';
 import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
-import { CurioMark } from './src/BrandSystem';
+import { CurioLogoLockup } from './src/BrandSystem';
 import { CurioIcon, CurioIconBadge, type IconName } from './src/IconSystem';
 import {
   CurioScene,
@@ -285,8 +285,7 @@ function Topbar({
         onPress={onHome}
         style={styles.brand}
       >
-        <CurioMark size={28} />
-        <AppText variant="title">Curio</AppText>
+        <CurioLogoLockup height={42} />
       </Pressable>
 
       <View style={styles.topbarActions}>

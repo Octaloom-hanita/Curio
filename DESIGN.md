@@ -5,7 +5,7 @@
 Curio is an adult learning companion that makes hidden mechanisms visible.
 
 The visual identity combines:
-- **The Opening** - a black C-like shell that opens to reveal colored inner planes
+- **The Opening** - the approved black C shell with the traced purple rear plane, orange front plane, white opening seam and green projection from the reference board
 - **Reveal the mechanism** - illustrations expose structure, movement, layers, cycles and relationships
 - **The Curious Study** - editorial, warm, intelligent, colorful and calm
 
@@ -70,7 +70,7 @@ Core learning actions:
 
 ## Illustration system
 
-Mechanism visuals are explanatory diagrams. Use colored zones, dark structural outlines, bold arrows, nodes/lines, cutaways and layers when they clarify the mechanism. Do not imply unsupported scientific detail.
+Mechanism visuals are explanatory illustrations, not generic diagrams. For the termite reference slice, reuse a consistent mound/cutaway silhouette across steps so the learner sees one system change over time. Use colored zones, dark structural outlines, bold arrows, nodes/lines, cutaways and layers when they clarify the mechanism. Do not imply unsupported scientific detail.
 
 Topic visuals are bolder and more iconic than mechanism diagrams. They may be playful in shape while remaining adult.
 
