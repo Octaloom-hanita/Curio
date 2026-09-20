@@ -23,7 +23,8 @@ import { AppText, AppTextScaleProvider } from './src/AppText';
 import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
 import { CurioIcon, CurioScene, type SceneName } from './src/Visuals';
-import { topics, type Topic } from './src/topics';
+import { topics as fallbackTopics, type Topic } from './src/topics';
+import { loadApprovedTopics } from './src/contentRepository';
 
 type Accent = 'orange' | 'green' | 'purple' | 'blue' | 'yellow';
 type Screen = 'home' | 'lesson';
@@ -265,11 +266,13 @@ function TopicCard({
 
 function HomeScreen({
   locale,
+  topics,
   onSelect,
   hasSession,
   onResume,
 }: {
   locale: Locale;
+  topics: Topic[];
   onSelect: (topic: Topic) => void;
   hasSession: boolean;
   onResume: () => void;
@@ -388,6 +391,7 @@ export default function App() {
   const [evaluation, setEvaluation] = useState<any>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
+  const [catalogTopics, setCatalogTopics] = useState<Topic[]>(fallbackTopics);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -433,6 +437,20 @@ export default function App() {
       document.documentElement.lang = locale;
     }
   }, [locale]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    loadApprovedTopics().then((remoteTopics) => {
+      if (!cancelled && remoteTopics.length > 0) {
+        setCatalogTopics(remoteTopics);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (!golosLoaded || !literataLoaded || !hydrated) {
     return (
@@ -570,6 +588,7 @@ export default function App() {
             {screen === 'home' ? (
               <HomeScreen
                 locale={locale}
+                topics={catalogTopics}
                 onSelect={startTopic}
                 hasSession={hasSession}
                 onResume={resumeLesson}
