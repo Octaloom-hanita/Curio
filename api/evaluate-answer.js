@@ -241,12 +241,8 @@ Return evidence only.
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0,
-            responseFormat: {
-              text: {
-                mimeType: 'application/json',
-                schema,
-              },
-            },
+            responseMimeType: 'application/json',
+            responseSchema: schema,
           },
         }),
       }
