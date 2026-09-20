@@ -401,9 +401,6 @@ export default function App() {
           if (saved.textScale === 1 || saved.textScale === 1.16) {
             setTextScale(saved.textScale);
           }
-          if (saved.screen === 'home' || saved.screen === 'lesson') {
-            setScreen(saved.screen);
-          }
           if (Number.isInteger(saved.index)) {
             setIndex(Math.max(0, Math.min(ui.ru.steps.length - 1, saved.index)));
           }
@@ -424,12 +421,12 @@ export default function App() {
     try {
       window.localStorage.setItem(
         'curio-mvp-state-v1',
-        JSON.stringify({ locale, textScale, screen, index, answer, hasSession })
+        JSON.stringify({ locale, textScale, index, answer, hasSession })
       );
     } catch {
       // Storage failure should not block the session.
     }
-  }, [hydrated, locale, textScale, screen, index, answer, hasSession]);
+  }, [hydrated, locale, textScale, index, answer, hasSession]);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -892,7 +889,7 @@ const styles = StyleSheet.create({
   },
   segmentedButton: {
     minWidth: 58,
-    minHeight: 48,
+    minHeight: 56,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.pill,
