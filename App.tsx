@@ -178,6 +178,72 @@ function PrimaryButton({
   );
 }
 
+function BottomNavigation({
+  locale,
+  screen,
+  onHome,
+  onExplore,
+}: {
+  locale: Locale;
+  screen: Screen;
+  onHome: () => void;
+  onExplore: () => void;
+}) {
+  const active = screen === 'home' ? 'today' : 'explore';
+  const items: {
+    key: 'today' | 'explore' | 'review' | 'library' | 'profile';
+    icon: IconName;
+    ru: string;
+    en: string;
+    enabled: boolean;
+    onPress?: () => void;
+    accent: string;
+  }[] = [
+    { key: 'today', icon: 'today', ru: 'Сегодня', en: 'Today', enabled: true, onPress: onHome, accent: colors.orange },
+    { key: 'explore', icon: 'explore', ru: 'Исследовать', en: 'Explore', enabled: true, onPress: onExplore, accent: colors.green },
+    { key: 'review', icon: 'review', ru: 'Повторить', en: 'Review', enabled: false, accent: colors.purple },
+    { key: 'library', icon: 'library', ru: 'Библиотека', en: 'Library', enabled: false, accent: colors.blue },
+    { key: 'profile', icon: 'profile', ru: 'Профиль', en: 'Profile', enabled: false, accent: colors.yellow },
+  ];
+
+  return (
+    <View style={styles.bottomNavWrap}>
+      <View style={styles.bottomNav}>
+        {items.map((item) => {
+          const selected = active === item.key;
+          return (
+            <Pressable
+              key={item.key}
+              accessibilityRole="button"
+              accessibilityState={{ selected, disabled: !item.enabled }}
+              accessibilityLabel={locale === 'ru' ? item.ru : item.en}
+              disabled={!item.enabled}
+              onPress={item.onPress}
+              style={({ pressed }) => [
+                styles.bottomNavItem,
+                selected && styles.bottomNavItemActive,
+                !item.enabled && styles.bottomNavItemDisabled,
+                pressed && item.enabled && { opacity: 0.76 },
+              ]}
+            >
+              <CurioIcon
+                name={item.icon}
+                size={28}
+                color={colors.ink}
+                accent={item.accent}
+              />
+              <AppText variant="meta">
+                {locale === 'ru' ? item.ru : item.en}
+              </AppText>
+              {selected && <View style={styles.bottomNavIndicator} />}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 function Topbar({
   locale,
   textScale,
@@ -203,7 +269,7 @@ function Topbar({
         onPress={onHome}
         style={styles.brand}
       >
-        <CurioMark size={38} />
+        <CurioMark size={30} />
         <AppText variant="title">Curio</AppText>
       </Pressable>
 
@@ -649,6 +715,15 @@ export default function App() {
     setScreen('home');
     setSelectedTopic(null);
     resetEvaluation();
+  };
+
+  const goExplore = () => {
+    resetEvaluation();
+    if (selectedTopic) {
+      setScreen('category');
+      return;
+    }
+    setScreen('home');
   };
 
   const loadLesson = async (immersionId: string) => {
@@ -1236,6 +1311,14 @@ export default function App() {
             )}
           </View>
         </ScrollView>
+        {screen !== 'lesson' && (
+          <BottomNavigation
+            locale={locale}
+            screen={screen}
+            onHome={goHome}
+            onExplore={goExplore}
+          />
+        )}
       </SafeAreaView>
     </AppTextScaleProvider>
   );
@@ -1255,12 +1338,57 @@ const styles = StyleSheet.create({
   page: {
     minHeight: '100%',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: 132,
   },
   shell: {
     width: '100%',
     maxWidth: 760,
     alignSelf: 'center',
+  },
+  bottomNavWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.base,
+    backgroundColor: colors.canvas,
+  },
+  bottomNav: {
+    width: '100%',
+    maxWidth: 760,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.hairline,
+    borderRadius: 24,
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
+    paddingBottom: 6,
+  },
+  bottomNavItem: {
+    flex: 1,
+    minHeight: 66,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    borderRadius: 16,
+    position: 'relative',
+  },
+  bottomNavItemActive: {
+    backgroundColor: '#FFF8F3',
+  },
+  bottomNavItemDisabled: {
+    opacity: 0.38,
+  },
+  bottomNavIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    width: 34,
+    height: 4,
+    borderRadius: radius.pill,
+    backgroundColor: colors.orange,
   },
   topbar: {
     flexDirection: 'row',
