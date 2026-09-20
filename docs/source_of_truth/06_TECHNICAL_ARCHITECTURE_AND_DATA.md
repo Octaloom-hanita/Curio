@@ -20,10 +20,15 @@
 ### Current persistence
 - browser localStorage for MVP progress/draft
 
-### Planned backend data layer
+### Backend data layer
+Planned runtime:
 - Supabase Postgres
 - Supabase Auth
 - Supabase Storage
+
+Prepared in repository, not yet applied to a Supabase project:
+- content migration v1
+- balanced bilingual content seed v1
 
 ### Planned audio
 - ElevenLabs TTS
@@ -69,6 +74,9 @@ Planned:
 - internal TTS generation endpoint/job
 
 ## Data model - content
+
+The repository now contains an implementation-ready first migration for the content layer.
+It uses stable language-independent text IDs with RU/EN localized fields on the same records.
 
 Core tables/entities:
 - users
