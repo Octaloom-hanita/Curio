@@ -23,6 +23,7 @@ import { AppText, AppTextScaleProvider } from './src/AppText';
 import { colors, radius, spacing } from './src/theme';
 import { ui, type Locale } from './src/i18n';
 import { CurioIcon, CurioScene, type SceneName } from './src/Visuals';
+import { CurioMark } from './src/visuals';
 import { topics, type Topic } from './src/topics';
 
 type Accent = 'orange' | 'green' | 'purple' | 'blue' | 'yellow';
@@ -184,7 +185,7 @@ function Topbar({
         onPress={onHome}
         style={styles.brand}
       >
-        <View style={styles.brandDot} />
+        <CurioMark size={34} />
         <AppText variant="title">Curio</AppText>
       </Pressable>
 
