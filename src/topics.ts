@@ -1,9 +1,10 @@
 import type { IconName } from './Visuals';
 
-export type TopicId = 'biomimicry' | 'neuroscience' | 'cognition' | 'social' | 'complex';
+export type TopicId = string;
 
 export type Topic = {
   id: TopicId;
+  immersionId?: string;
   icon: IconName;
   color: 'orange' | 'green' | 'purple' | 'blue' | 'yellow';
   ready: boolean;

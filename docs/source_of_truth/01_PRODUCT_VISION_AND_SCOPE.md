@@ -54,12 +54,20 @@ Concepts are the reusable atomic knowledge units.
 
 ## Core domains for the initial knowledge library
 
-1. Complex systems
-2. Evolution and origins of life
+Curio's content identity is broad scientific curiosity with a strong brain/cognition pillar.
+
+Initial discovery areas:
+
+1. Earth, water, climate and environment
+2. Life, evolution, animals and plants
 3. Brain and neuroscience
-4. Cognitive psychology and learning
-5. Networks and social systems
-6. Biomimicry and bio-inspired design
+4. Cognition, learning and decision-making
+5. Human behavior, society and culture
+6. Body, movement and healthy aging
+7. Materials, buildings, sensors and robotics
+8. Scientific thinking, invention and systems
+
+The profession/field inventory is a discovery lens for generating and organizing questions. It is not a separate core content entity in v1.
 
 These domains are connected by recurring mechanisms such as:
 - emergence

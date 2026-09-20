@@ -43,12 +43,19 @@ A regression suite passed 11/11 cases, including:
 
 ### P0 - Content foundation
 
-Before filling the product randomly:
-- inventory the project source library
-- build the concept map
-- define the first 20-30 learning questions
-- select the first 4-6 full Immersions
-- map claims to sources
+Prepared:
+- source inventory and broadened coverage map
+- balanced discovery structure
+- first curated 30-question RU/EN seed
+- first 6 balanced Immersion skeletons
+- reusable first-wave Concepts
+- Supabase content schema + seed in the repository
+
+Still required before approving/publishing the new Immersions:
+- claim-level source mapping
+- primary/review source acquisition for evidence gaps
+- scientific/editorial review
+- Russian editorial review
 
 ### P1 - More learning content
 
@@ -86,15 +93,13 @@ Chrome microphone:
 
 ### P1 - Persistence and review
 
-Move from local-only state to Supabase:
-- user
-- progress
-- answers
-- review history
-- audio assets
-- sources/content
+Content schema and seed are live in Supabase and passed initial structural QA.
 
-Then enable delayed review.
+Next:
+- decide anonymous first use vs account required
+- add user/progress/answers/review history in a later migration
+- migrate browser-local progress deliberately
+- then enable delayed review
 
 ### P1 - API protection
 

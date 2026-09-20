@@ -20,10 +20,18 @@
 ### Current persistence
 - browser localStorage for MVP progress/draft
 
-### Planned backend data layer
+### Backend data layer
+Planned runtime:
 - Supabase Postgres
 - Supabase Auth
 - Supabase Storage
+
+Live in the Curio Supabase project:
+- content migration v1
+- content hardening migration
+- balanced bilingual content seed v1
+
+The live content database currently contains the curated draft foundation. Public application reads remain gated by editorial approval through RLS.
 
 ### Planned audio
 - ElevenLabs TTS
@@ -69,6 +77,9 @@ Planned:
 - internal TTS generation endpoint/job
 
 ## Data model - content
+
+The first content migration and seed are now applied to the live Curio Supabase project and remain versioned in the repository.
+It uses stable language-independent text IDs with RU/EN localized fields on the same records.
 
 Core tables/entities:
 - users
