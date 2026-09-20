@@ -220,7 +220,9 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState('');
-  const [evalNotice, setEvalNotice] = useState(false);
+  const [evaluation, setEvaluation] = useState<any>(null);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evaluationError, setEvaluationError] = useState<string | null>(null);
 
   const copy = ui[locale];
   const step = copy.steps[index];
@@ -237,26 +239,66 @@ export default function App() {
     setScreen('home');
     setIndex(0);
     setAnswer('');
-    setEvalNotice(false);
+    setEvaluation(null);
+    setEvaluationError(null);
   };
 
   const startTopic = (_topic: Topic) => {
     setScreen('lesson');
     setIndex(0);
     setAnswer('');
-    setEvalNotice(false);
+    setEvaluation(null);
+    setEvaluationError(null);
   };
 
-  const next = () => {
+  const next = async () => {
     if (kind === 'recall') {
-      setEvalNotice(true);
+      if (!answer.trim()) {
+        setEvaluationError(
+          locale === 'ru'
+            ? 'Сначала напишите короткий ответ своими словами.'
+            : 'First write a short answer in your own words.'
+        );
+        return;
+      }
+
+      setIsEvaluating(true);
+      setEvaluation(null);
+      setEvaluationError(null);
+
+      try {
+        const response = await fetch('/api/evaluate-answer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answerText: answer, locale }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data?.error || 'EVALUATION_FAILED');
+        }
+
+        setEvaluation(data);
+      } catch (error) {
+        setEvaluationError(
+          locale === 'ru'
+            ? 'Не удалось проверить ответ. Попробуйте ещё раз.'
+            : 'Could not evaluate the answer. Please try again.'
+        );
+      } finally {
+        setIsEvaluating(false);
+      }
+
       return;
     }
+
     setIndex((value) => Math.min(value + 1, copy.steps.length - 1));
   };
 
   const skipFeedback = () => {
-    setEvalNotice(false);
+    setEvaluation(null);
+    setEvaluationError(null);
     setIndex((value) => Math.min(value + 2, copy.steps.length - 1));
   };
 
@@ -321,28 +363,81 @@ export default function App() {
                   <TextInput
                     multiline
                     value={answer}
-                    onChangeText={(value) => { setAnswer(value); setEvalNotice(false); }}
+                    onChangeText={(value) => {
+                      setAnswer(value);
+                      setEvaluation(null);
+                      setEvaluationError(null);
+                    }}
                     placeholder={copy.writeInstead}
                     placeholderTextColor={colors.muted}
                     style={styles.input}
                   />
 
-                  {evalNotice && (
+                  {isEvaluating && (
                     <View style={styles.aiNotice}>
-                      <CurioIcon name="network" size={48} fill={colors.purple} />
+                      <ActivityIndicator size="large" color={colors.purple} />
                       <View style={styles.noteCopy}>
                         <AppText variant="label">
-                          {locale === 'ru' ? 'AI-проверка ещё не подключена' : 'AI evaluation is not connected yet'}
+                          {locale === 'ru' ? 'Проверяю понимание...' : 'Checking your understanding...'}
                         </AppText>
-                        <AppText variant="bodySmall">
+                        <AppText variant="bodySmall" color="muted">
                           {locale === 'ru'
-                            ? 'Сейчас Curio не анализирует этот текст. Мы не будем показывать фиктивную обратную связь.'
-                            : 'Curio is not analyzing this text yet. We will not show fake personalized feedback.'}
+                            ? 'Gemini сравнивает ответ с ключевыми идеями урока.'
+                            : 'Gemini is comparing your answer with the lesson rubric.'}
                         </AppText>
+                      </View>
+                    </View>
+                  )}
+
+                  {evaluationError && (
+                    <View style={styles.aiNotice}>
+                      <CurioIcon name="bulb" size={48} fill={colors.yellow} />
+                      <View style={styles.noteCopy}>
+                        <AppText variant="label">
+                          {locale === 'ru' ? 'Нужна ещё одна попытка' : 'One more try'}
+                        </AppText>
+                        <AppText variant="bodySmall">{evaluationError}</AppText>
+                      </View>
+                    </View>
+                  )}
+
+                  {evaluation && (
+                    <View style={styles.aiResult}>
+                      <CurioIcon
+                        name={evaluation.status === 'understood' ? 'bulb' : 'network'}
+                        size={52}
+                        fill={evaluation.status === 'understood' ? colors.green : colors.purple}
+                      />
+                      <View style={styles.noteCopy}>
+                        <AppText variant="title">{evaluation.feedback.title}</AppText>
+                        <AppText variant="bodySmall">{evaluation.feedback.summary}</AppText>
+
+                        {evaluation.feedback.strengths?.length > 0 && (
+                          <View style={styles.feedbackList}>
+                            <AppText variant="label">
+                              {locale === 'ru' ? 'Что уже есть в ответе' : 'What is already in your answer'}
+                            </AppText>
+                            {evaluation.feedback.strengths.map((item: string, i: number) => (
+                              <AppText key={i} variant="bodySmall">• {item}</AppText>
+                            ))}
+                          </View>
+                        )}
+
+                        {evaluation.feedback.next?.length > 0 && (
+                          <View style={styles.feedbackList}>
+                            <AppText variant="label">
+                              {locale === 'ru' ? 'Что стоит добавить' : 'What to add'}
+                            </AppText>
+                            {evaluation.feedback.next.map((item: string, i: number) => (
+                              <AppText key={i} variant="bodySmall">• {item}</AppText>
+                            ))}
+                          </View>
+                        )}
+
                         <Button
-                          label={locale === 'ru' ? 'Продолжить без проверки' : 'Continue without evaluation'}
+                          label={locale === 'ru' ? 'Продолжить' : 'Continue'}
                           onPress={skipFeedback}
-                          secondary
+                          accent={evaluation.status === 'understood' ? 'green' : 'purple'}
                         />
                       </View>
                     </View>
@@ -350,7 +445,7 @@ export default function App() {
                 </>
               )}
 
-              {step.cta && !evalNotice && (
+              {step.cta && !evaluation && !isEvaluating && (
                 <View style={styles.actions}>
                   <Button label={kind === 'recall' ? (locale === 'ru' ? 'Проверить ответ' : 'Check my answer') : step.cta} onPress={next} accent={accent} />
                   {kind === 'recall' && (
@@ -413,4 +508,6 @@ const styles = StyleSheet.create({
   voicePanel: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.base, padding: spacing.lg, borderRadius: radius.surface, backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.purple },
   voiceText: { flex: 1, gap: spacing.xs },
   aiNotice: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.base, padding: spacing.lg, backgroundColor: colors.warningSoft, borderWidth: 3, borderColor: colors.purple, borderRadius: radius.surface },
+  aiResult: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.base, padding: spacing.lg, backgroundColor: colors.surface, borderWidth: 3, borderColor: colors.purple, borderRadius: radius.surface },
+  feedbackList: { gap: spacing.xs, marginTop: spacing.sm },
 });
