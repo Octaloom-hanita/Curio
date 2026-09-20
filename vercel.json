@@ -1,5 +1,13 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "expo export -p web",
   "outputDirectory": "dist",
-  "framework": null
+  "devCommand": "expo",
+  "cleanUrls": true,
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/"
+    }
+  ]
 }
