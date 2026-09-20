@@ -811,7 +811,7 @@ export default function App() {
                     kind === 'note' && styles.noteBox,
                   ]}
                 >
-                  {step.body.map((paragraph, paragraphIndex) => (
+                  {step.body.map((paragraph: string, paragraphIndex: number) => (
                     <AppText key={paragraphIndex} variant="body">
                       {paragraph}
                     </AppText>
