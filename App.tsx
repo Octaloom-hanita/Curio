@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -215,9 +215,12 @@ function TopicCard({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled: !topic.ready }}
+      disabled={!topic.ready}
       onPress={onPress}
       style={({ pressed }) => [
         styles.topicCard,
+        !topic.ready && styles.topicCardDisabled,
         pressed && { opacity: 0.82 },
       ]}
     >
@@ -263,25 +266,18 @@ function TopicCard({
 function HomeScreen({
   locale,
   onSelect,
+  hasSession,
+  onResume,
 }: {
   locale: Locale;
   onSelect: (topic: Topic) => void;
+  hasSession: boolean;
+  onResume: () => void;
 }) {
   const copy = ui[locale];
-  const [notice, setNotice] = useState<string | null>(null);
 
   const select = (topic: Topic) => {
-    if (topic.ready) {
-      setNotice(null);
-      onSelect(topic);
-      return;
-    }
-
-    setNotice(
-      locale === 'ru'
-        ? 'Эта тема уже запланирована, но полноценное исследование ещё не готово.'
-        : 'This topic is planned, but its full exploration is not ready yet.'
-    );
+    if (topic.ready) onSelect(topic);
   };
 
   return (
@@ -294,6 +290,22 @@ function HomeScreen({
           {copy.chooseTopicBody}
         </AppText>
       </View>
+
+      {hasSession && (
+        <View style={styles.resumeCard}>
+          <View style={styles.resumeCopy}>
+            <AppText variant="title">{copy.resumeTitle}</AppText>
+            <AppText variant="bodySmall" color="muted">
+              {copy.resumeBody}
+            </AppText>
+          </View>
+          <PrimaryButton
+            label={copy.resumeAction}
+            onPress={onResume}
+            accent="green"
+          />
+        </View>
+      )}
 
       <View style={styles.honestyNote}>
         <CurioIcon name="bulb" size={42} fill={colors.yellow} />
@@ -311,11 +323,6 @@ function HomeScreen({
         ))}
       </View>
 
-      {notice && (
-        <View style={styles.catalogNotice}>
-          <AppText variant="bodySmall">{notice}</AppText>
-        </View>
-      )}
     </>
   );
 }
@@ -376,11 +383,61 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState('');
+  const [hasSession, setHasSession] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [evaluation, setEvaluation] = useState<any>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationError, setEvaluationError] = useState<string | null>(null);
 
-  if (!golosLoaded || !literataLoaded) {
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = window.localStorage.getItem('curio-mvp-state-v1');
+        if (raw) {
+          const saved = JSON.parse(raw);
+          if (saved.locale === 'ru' || saved.locale === 'en') {
+            setLocale(saved.locale);
+          }
+          if (saved.textScale === 1 || saved.textScale === 1.16) {
+            setTextScale(saved.textScale);
+          }
+          if (saved.screen === 'home' || saved.screen === 'lesson') {
+            setScreen(saved.screen);
+          }
+          if (Number.isInteger(saved.index)) {
+            setIndex(Math.max(0, Math.min(ui.ru.steps.length - 1, saved.index)));
+          }
+          if (typeof saved.answer === 'string') {
+            setAnswer(saved.answer.slice(0, 3000));
+          }
+          setHasSession(Boolean(saved.hasSession));
+        }
+      } catch {
+        // Corrupt local state should never block learning.
+      }
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated || typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(
+        'curio-mvp-state-v1',
+        JSON.stringify({ locale, textScale, screen, index, answer, hasSession })
+      );
+    } catch {
+      // Storage failure should not block the session.
+    }
+  }, [hydrated, locale, textScale, screen, index, answer, hasSession]);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = locale;
+    }
+  }, [locale]);
+
+  if (!golosLoaded || !literataLoaded || !hydrated) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color={colors.orange} />
@@ -404,13 +461,25 @@ export default function App() {
 
   const goHome = () => {
     setScreen('home');
-    setIndex(0);
-    setAnswer('');
     resetEvaluation();
   };
 
   const startTopic = (_topic: Topic) => {
     setScreen('lesson');
+    setIndex(0);
+    setAnswer('');
+    setHasSession(true);
+    resetEvaluation();
+  };
+
+  const resumeLesson = () => {
+    setScreen('lesson');
+    resetEvaluation();
+  };
+
+  const finishAndHome = () => {
+    setHasSession(false);
+    setScreen('home');
     setIndex(0);
     setAnswer('');
     resetEvaluation();
@@ -467,6 +536,10 @@ export default function App() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data?.error === 'GEMINI_ACCESS_DENIED') {
+          setEvaluationError(copy.aiUnavailable);
+          return;
+        }
         throw new Error(data?.error || 'EVALUATION_FAILED');
       }
 
@@ -497,7 +570,12 @@ export default function App() {
             />
 
             {screen === 'home' ? (
-              <HomeScreen locale={locale} onSelect={startTopic} />
+              <HomeScreen
+                locale={locale}
+                onSelect={startTopic}
+                hasSession={hasSession}
+                onResume={resumeLesson}
+              />
             ) : (
               <>
                 <LessonProgress
@@ -507,7 +585,20 @@ export default function App() {
                   onBack={goBack}
                 />
 
-                <CurioScene name={scene} />
+                {[1, 2, 3, 4, 5, 9].includes(index) && (
+                  <View style={styles.sceneBlock}>
+                    <CurioScene name={scene} />
+                    <AppText variant="meta" color="muted" style={styles.sceneCaption}>
+                      {scene === 'heat'
+                        ? copy.sceneHeat
+                        : scene === 'cycle'
+                        ? copy.sceneCycle
+                        : scene === 'connection'
+                        ? copy.sceneConnection
+                        : copy.sceneFlow}
+                    </AppText>
+                  </View>
+                )}
 
                 <View style={styles.eyebrowRow}>
                   <View
@@ -559,6 +650,7 @@ export default function App() {
                       }}
                       placeholder={copy.answerPlaceholder}
                       placeholderTextColor={colors.muted}
+                      maxLength={3000}
                       style={[
                         styles.input,
                         {
@@ -642,6 +734,19 @@ export default function App() {
                           </View>
                         )}
 
+                        {evaluation.feedback.corrections?.length > 0 && (
+                          <View style={styles.feedbackSection}>
+                            <AppText variant="label">{copy.correctionTitle}</AppText>
+                            {evaluation.feedback.corrections.map(
+                              (item: string, itemIndex: number) => (
+                                <AppText key={itemIndex} variant="bodySmall">
+                                  • {item}
+                                </AppText>
+                              )
+                            )}
+                          </View>
+                        )}
+
                         <View style={styles.feedbackActions}>
                           {evaluation.status === 'understood' ? (
                             <PrimaryButton
@@ -713,7 +818,7 @@ export default function App() {
                   <View style={styles.actions}>
                     <PrimaryButton
                       label={copy.topics}
-                      onPress={goHome}
+                      onPress={finishAndHome}
                       accent="green"
                     />
                   </View>
@@ -815,6 +920,18 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginBottom: spacing.lg,
   },
+  resumeCard: {
+    gap: spacing.base,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    backgroundColor: '#EEF8F2',
+    borderWidth: 2,
+    borderColor: colors.ink,
+    borderRadius: radius.surface,
+  },
+  resumeCopy: {
+    gap: spacing.xs,
+  },
   honestyNote: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -844,6 +961,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+  },
+  topicCardDisabled: {
+    opacity: 0.55,
   },
   topicCopy: {
     flex: 1,
@@ -912,6 +1032,13 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: colors.green,
     borderRadius: radius.pill,
+  },
+  sceneBlock: {
+    marginBottom: spacing.sm,
+  },
+  sceneCaption: {
+    textAlign: 'center',
+    marginTop: -8,
   },
   eyebrowRow: {
     flexDirection: 'row',
