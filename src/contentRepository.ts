@@ -1,14 +1,11 @@
 import type { IconName } from './Visuals';
 import type { Topic } from './topics';
 
-const SUPABASE_URL =
-  process.env.EXPO_PUBLIC_SUPABASE_URL ??
-  'https://quxhnwpbrkiisrseaexs.supabase.co';
+const SUPABASE_URL = 'https://quxhnwpbrkiisrseaexs.supabase.co';
 
-// This is a Supabase publishable key, not a secret. RLS remains the security boundary.
-// It can be overridden through EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY without code changes.
+// Supabase publishable keys are designed for client-side use.
+// RLS, not key secrecy, is the authorization boundary.
 const SUPABASE_PUBLISHABLE_KEY =
-  process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
   'sb_publishable_506h_HDrCY7cOpx9WE7tVA_0KztHoaF';
 
 type TopicRow = {
