@@ -2,9 +2,17 @@ import type { IconName } from './Visuals';
 
 export type TopicId = string;
 
+export type DiscoveryQuestion = {
+  id: string;
+  immersionId?: string;
+  ru: string;
+  en: string;
+};
+
 export type Topic = {
   id: TopicId;
   immersionId?: string;
+  questions?: DiscoveryQuestion[];
   icon: IconName;
   color: 'orange' | 'green' | 'purple' | 'blue' | 'yellow';
   ready: boolean;
