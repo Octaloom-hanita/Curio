@@ -1,16 +1,18 @@
-import Svg, { Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { colors } from './theme';
 
 export function CurioMark({
-  size = 36,
+  size = 32,
   mono = false,
 }: {
   size?: number;
   mono?: boolean;
 }) {
+  const shell = colors.ink;
   const orange = mono ? colors.ink : colors.orange;
   const purple = mono ? colors.ink : colors.purple;
   const green = mono ? colors.ink : colors.green;
+  const cutout = colors.canvas;
 
   return (
     <Svg
@@ -20,43 +22,30 @@ export function CurioMark({
       accessibilityElementsHidden
       focusable={false}
     >
-      <Rect
-        x="7"
-        y="7"
-        width="50"
-        height="50"
-        rx="16"
-        fill={colors.surface}
-        stroke={colors.ink}
-        strokeWidth="3"
-      />
+      <Circle cx="28" cy="32" r="24" fill={shell} />
+      <Circle cx="28" cy="32" r="12" fill={cutout} />
+      <Rect x="28" y="17" width="19" height="30" fill={cutout} />
+
       <Path
-        d="M16 17 31 22v25L16 52Z"
-        fill={orange}
-        stroke={colors.ink}
-        strokeWidth="2.8"
-        strokeLinejoin="round"
-      />
-      <Path
-        d="m48 17-14 5v25l14 5Z"
+        d="M27 20 42 16v32l-15-4Z"
         fill={purple}
-        stroke={colors.ink}
-        strokeWidth="2.8"
+        stroke={shell}
+        strokeWidth="2.2"
         strokeLinejoin="round"
       />
       <Path
-        d="m31 25 7-3v23l-7-3Z"
+        d="M40 17 55 11v42l-15-5Z"
+        fill={orange}
+        stroke={shell}
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="m22 44 18 4-9 7-15-5Z"
         fill={green}
-        stroke={colors.ink}
-        strokeWidth="2.6"
+        stroke={shell}
+        strokeWidth="2"
         strokeLinejoin="round"
-      />
-      <Path
-        d="M31 22v25"
-        fill="none"
-        stroke={colors.ink}
-        strokeWidth="2.8"
-        strokeLinecap="round"
       />
     </Svg>
   );
