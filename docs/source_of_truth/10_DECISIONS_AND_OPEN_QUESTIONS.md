@@ -32,6 +32,10 @@ Updated: 2026-09-20
 - Curio publishes original explanations.
 - Important claims map to sources.
 - Scientific disagreement is represented honestly.
+- Curio is broad scientific curiosity, not a nature-only product.
+- Brain/neuroscience and cognition/learning are major pillars alongside Earth, life, society, body, technology and systems.
+- Professions/fields are a discovery lens in v1, not a dedicated core database entity.
+- The first curated database seed contains 30 bilingual questions and 6 balanced Immersion skeletons.
 
 ### AI
 - Current evaluation provider is Gemini through Vercel server-side code.
@@ -72,9 +76,9 @@ The following older ideas are no longer canonical:
 ## Open questions
 
 ### Content
-- Which 20-30 questions form the first curated knowledge map?
-- Which 4-6 should become full Immersions first?
 - How much book-level learning versus concept/phenomenon learning belongs in MVP?
+- Which of the first six Immersion skeletons should reach scientific/editorial approval first?
+- Which additional profession/field lenses are useful enough in discovery to justify a future dedicated entity?
 
 ### Sources and rights
 - Which uploaded book copies are verified as lawfully acquired?
@@ -111,7 +115,14 @@ The following older ideas are no longer canonical:
 
 Do not add many random topics directly to code.
 
-First complete:
-Source Inventory -> Concept Map -> First 20-30 Questions -> First 4-6 Immersions -> Content DB seed.
+The first balanced Content DB schema and seed are now prepared in the repository.
 
-Then continue microphone, ElevenLabs and Supabase implementation against that structure.
+Next:
+1. Connect the Supabase project.
+2. Apply the content migration and seed.
+3. QA counts, RLS and bilingual reads.
+4. Continue claim-level source mapping and editorial review for the first six Immersions.
+5. Add learning/user persistence in a later migration after the anonymous-vs-account-first decision.
+6. Only then replace hard-coded catalog/discovery data in the app.
+
+Microphone and ElevenLabs continue after the content/persistence foundation is stable.
