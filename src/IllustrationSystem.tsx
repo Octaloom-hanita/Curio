@@ -1,35 +1,20 @@
-import Svg, { Circle, Ellipse, Line, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Line, Path, Rect } from 'react-native-svg';
 import { colors } from './theme';
 
 export type MechanismIllustrationName =
-  | 'airflow'
-  | 'temperature-difference'
-  | 'structure-paths'
-  | 'decentralized'
-  | 'daily-cycle'
-  | 'recall'
-  | 'connection'
-  | 'complete';
+  | 'airflow' | 'temperature-difference' | 'structure-paths' | 'decentralized'
+  | 'daily-cycle' | 'recall' | 'connection' | 'complete';
 
 export type TopicVisualName =
-  | 'earth'
-  | 'life'
-  | 'brain'
-  | 'cognition'
-  | 'society'
-  | 'body'
-  | 'technology'
-  | 'science';
+  | 'earth' | 'life' | 'brain' | 'cognition'
+  | 'society' | 'body' | 'technology' | 'science';
 
 export type EmptyStateIllustrationName =
-  | 'no-reviews'
-  | 'no-saved'
-  | 'coming-soon'
-  | 'offline';
+  | 'no-reviews' | 'no-saved' | 'coming-soon' | 'offline';
 
 const line = {
   stroke: colors.ink,
-  strokeWidth: 3,
+  strokeWidth: 3.2,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
 };
@@ -40,6 +25,33 @@ const lightLine = {
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
 };
+
+function MoundShell({
+  fill = colors.yellowSoft,
+  stroke = colors.ink,
+}: {
+  fill?: string;
+  stroke?: string;
+}) {
+  return (
+    <>
+      <Path
+        d="M36 150C46 119 50 80 69 56c18-23 43-34 72-34 39 0 67 14 87 40 20 26 30 60 56 88Z"
+        fill={fill}
+        stroke={stroke}
+        strokeWidth="3.2"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M28 151h264"
+        fill="none"
+        stroke={colors.ink}
+        strokeWidth="3.2"
+        strokeLinecap="round"
+      />
+    </>
+  );
+}
 
 export function CurioMechanismIllustration({
   name,
@@ -54,126 +66,156 @@ export function CurioMechanismIllustration({
     <Svg width={width} height={height} viewBox="0 0 320 180">
       {name === 'airflow' && (
         <>
-          <Path d="M68 142V48c0-12 10-22 22-22h52v116Z" fill={colors.surfaceSoft} {...line} />
-          <Path d="M178 142V26h52c12 0 22 10 22 22v94Z" fill={colors.warmNote} {...line} />
-          <Path d="M101 126C83 101 84 73 105 52" fill="none" {...line} />
-          <Path d="m96 58 10-7-2 12" fill="none" {...line} />
-          <Path d="M215 50c22 25 22 55 1 78" fill="none" {...line} />
-          <Path d="m225 121-10 8 2-13" fill="none" {...line} />
-          <Path d="M141 66c13-8 25-8 38 0" fill="none" {...lightLine} />
-          <Path d="M141 108c13 8 25 8 38 0" fill="none" {...lightLine} />
-          <Circle cx="160" cy="87" r="9" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="84" cy="42" r="8" fill={colors.blue} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="236" cy="138" r="8" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
+          <MoundShell fill={colors.yellowSoft} />
+          <Path
+            d="M82 145c3-35 2-66 22-91 11-13 24-18 39-18"
+            fill="none"
+            stroke={colors.blue}
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          <Path d="m131 29 14 7-13 9" fill="none" {...line} />
+          <Path
+            d="M214 41c19 28 20 63 13 103"
+            fill="none"
+            stroke={colors.orange}
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          <Path d="m219 132 8 14 9-13" fill="none" {...line} />
+          <Path
+            d="M118 66c17 11 32 16 48 16 14 0 27-4 40-11M106 111c20-9 38-12 56-10 19 2 35 8 52 18"
+            fill="none"
+            {...lightLine}
+          />
+          <Circle cx="166" cy="83" r="11" fill={colors.green} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="74" cy="142" r="8" fill={colors.blue} stroke={colors.ink} strokeWidth="2.4" />
+          <Circle cx="231" cy="143" r="8" fill={colors.orange} stroke={colors.ink} strokeWidth="2.4" />
         </>
       )}
 
       {name === 'temperature-difference' && (
         <>
-          <Rect x="40" y="34" width="82" height="112" rx="22" fill={colors.warmNote} stroke={colors.ink} strokeWidth="3" />
-          <Rect x="198" y="34" width="82" height="112" rx="22" fill="#EAF4FF" stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="81" cy="69" r="18" fill={colors.orange} stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="239" cy="111" r="18" fill={colors.blue} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M121 61c36-15 70-7 91 20" fill="none" {...line} />
-          <Path d="m203 73 10 9-13 1" fill="none" {...line} />
-          <Path d="M198 124c-32 15-66 7-88-20" fill="none" {...line} />
-          <Path d="m119 113-10-10 13-1" fill="none" {...line} />
-          <Line x1="81" y1="96" x2="81" y2="127" {...lightLine} />
-          <Line x1="239" y1="54" x2="239" y2="85" {...lightLine} />
+          <MoundShell fill={colors.surface} />
+          <Path
+            d="M42 148C53 111 55 76 78 52c15-16 31-24 50-27v123Z"
+            fill={colors.blueSoft}
+          />
+          <Path
+            d="M128 25c39-4 71 10 94 39 19 24 29 57 55 84H128Z"
+            fill={colors.orangeSoft}
+          />
+          <Path
+            d="M36 150C46 119 50 80 69 56c18-23 43-34 72-34 39 0 67 14 87 40 20 26 30 60 56 88Z"
+            fill="none"
+            stroke={colors.ink}
+            strokeWidth="3.2"
+            strokeLinejoin="round"
+          />
+          <Circle cx="231" cy="38" r="19" fill={colors.orange} stroke={colors.ink} strokeWidth="2.8" />
+          <Circle cx="84" cy="123" r="16" fill={colors.blue} stroke={colors.ink} strokeWidth="2.8" />
+          <Path d="M109 117c24-14 46-17 68-10 15 5 29 13 42 25" fill="none" stroke={colors.blue} strokeWidth="7" strokeLinecap="round" />
+          <Path d="m207 121 13 12-17 1" fill="none" {...line} />
+          <Path d="M198 62c-18 10-34 13-50 10-14-2-26-8-38-17" fill="none" stroke={colors.orange} strokeWidth="7" strokeLinecap="round" />
+          <Path d="m121 50-13 5 9 11" fill="none" {...line} />
         </>
       )}
 
       {name === 'structure-paths' && (
         <>
-          <Rect x="54" y="25" width="212" height="130" rx="30" fill={colors.surfaceSoft} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M96 136V53c0-10 8-18 18-18h12v101" fill="none" {...line} />
-          <Path d="M154 136V67c0-10 8-18 18-18h10v87" fill="none" {...line} />
-          <Path d="M210 136V45" fill="none" {...line} />
-          <Path d="M96 86h58M154 99h56M126 62h56" fill="none" {...lightLine} />
-          <Path d="M96 124V79" stroke={colors.blue} strokeWidth="6" fill="none" strokeLinecap="round" />
-          <Path d="m90 88 6-10 6 10" fill="none" {...line} />
-          <Path d="M210 55v54" stroke={colors.orange} strokeWidth="6" fill="none" strokeLinecap="round" />
-          <Path d="m204 100 6 10 6-10" fill="none" {...line} />
-          <Circle cx="154" cy="99" r="7" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="182" cy="62" r="7" fill={colors.purple} stroke={colors.ink} strokeWidth="2.5" />
+          <MoundShell fill={colors.orangeSoft} />
+          <Path
+            d="M92 146V83c0-18 12-31 29-31h16v94"
+            fill={colors.blueSoft}
+            stroke={colors.ink}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M143 146V64c0-16 11-27 26-27h13v109"
+            fill={colors.greenSoft}
+            stroke={colors.ink}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M188 146V91c0-15 10-25 24-25h12v80"
+            fill={colors.purpleSoft}
+            stroke={colors.ink}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <Path d="M92 103h51M143 87h45M182 115h42" fill="none" {...lightLine} />
+          <Path d="M92 135V93" stroke={colors.blue} strokeWidth="8" fill="none" strokeLinecap="round" />
+          <Path d="m85 102 7-11 7 11" fill="none" {...line} />
+          <Path d="M224 78v48" stroke={colors.orange} strokeWidth="8" fill="none" strokeLinecap="round" />
+          <Path d="m217 117 7 11 7-11" fill="none" {...line} />
+          <Circle cx="164" cy="88" r="8" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.4" />
         </>
       )}
 
       {name === 'decentralized' && (
         <>
-          <Circle cx="160" cy="90" r="60" fill={colors.surfaceSoft} stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="113" cy="72" r="11" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="151" cy="51" r="10" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="202" cy="68" r="11" fill={colors.purple} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="194" cy="119" r="10" fill={colors.blue} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="136" cy="125" r="10" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
-          <Line x1="123" y1="67" x2="141" y2="56" {...lightLine} />
-          <Line x1="161" y1="54" x2="191" y2="65" {...lightLine} />
-          <Line x1="201" y1="79" x2="196" y2="109" {...lightLine} />
-          <Line x1="184" y1="122" x2="146" y2="125" {...lightLine} />
-          <Line x1="130" y1="116" x2="117" y2="82" {...lightLine} />
-          <Path d="M78 53C47 77 48 116 78 139" fill="none" {...line} />
-          <Path d="m68 132 11 8 1-13" fill="none" {...line} />
-          <Path d="M242 139c31-24 30-63 0-86" fill="none" {...line} />
-          <Path d="m252 60-11-8-1 13" fill="none" {...line} />
+          <MoundShell fill={colors.greenSoft} />
+          <Path d="M93 89 129 59l38 14 36-18 28 35-19 36-44 7-38-19Z" fill="none" stroke={colors.ink} strokeWidth="2.3" strokeLinejoin="round" />
+          <Circle cx="93" cy="89" r="12" fill={colors.orange} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="129" cy="59" r="11" fill={colors.green} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="167" cy="73" r="11" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="203" cy="55" r="12" fill={colors.purple} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="231" cy="90" r="11" fill={colors.blue} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="212" cy="126" r="11" fill={colors.orange} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="168" cy="133" r="11" fill={colors.green} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="130" cy="114" r="11" fill={colors.purple} stroke={colors.ink} strokeWidth="2.6" />
+          <Path d="M65 67C49 89 51 115 70 135M253 136c19-22 19-47 1-69" fill="none" {...line} />
+          <Path d="m61 127 10 9 2-13M262 76l-9-10-3 13" fill="none" {...line} />
         </>
       )}
 
       {name === 'daily-cycle' && (
         <>
-          <Circle cx="160" cy="90" r="57" fill={colors.surface} stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="83" cy="52" r="22" fill={colors.yellow} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M238 33c16 5 24 21 18 36-18 1-31-11-31-27 3-4 7-7 13-9Z" fill={colors.purple} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M123 59c21-18 54-19 77-1" fill="none" {...line} />
-          <Path d="m190 49 11 9-13 2" fill="none" {...line} />
-          <Path d="M200 122c-21 18-54 19-77 1" fill="none" {...line} />
-          <Path d="m133 132-11-9 13-2" fill="none" {...line} />
-          <Path d="M144 72c11-8 21-8 32 0v36c-11 8-21 8-32 0Z" fill={colors.surfaceSoft} stroke={colors.ink} strokeWidth="2.5" />
-          <Path d="M152 80v20M168 80v20" {...lightLine} />
+          <MoundShell fill={colors.purpleSoft} />
+          <Circle cx="73" cy="42" r="22" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.8" />
+          <Path d="M247 27c17 5 25 20 20 35-17 2-31-9-32-25 3-4 7-8 12-10Z" fill={colors.purple} stroke={colors.ink} strokeWidth="2.8" />
+          <Path d="M104 59c30-20 70-20 103 0" fill="none" stroke={colors.orange} strokeWidth="7" strokeLinecap="round" />
+          <Path d="m194 49 14 10-16 2" fill="none" {...line} />
+          <Path d="M208 121c-31 20-71 20-104 0" fill="none" stroke={colors.blue} strokeWidth="7" strokeLinecap="round" />
+          <Path d="m117 131-14-10 16-2" fill="none" {...line} />
+          <Path d="M142 145V87c0-14 9-24 23-24h9v82" fill={colors.surface} stroke={colors.ink} strokeWidth="2.8" />
         </>
       )}
 
       {name === 'recall' && (
         <>
-          <Path d="M112 47c-18 0-32 15-32 33 0 12 6 23 17 29-4 21 17 34 35 22 8 11 24 13 35 4V49c-16-11-36-7-45 6-3-5-6-8-10-8Z" fill={colors.warmNote} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M208 47c18 0 32 15 32 33 0 12-6 23-17 29 4 21-17 34-35 22-8 11-24 13-35 4V49c16-11 36-7 45 6 3-5 6-8 10-8Z" fill="#F3ECFA" stroke={colors.ink} strokeWidth="3" />
-          <Path d="M160 52v78" fill="none" {...line} />
-          <Path d="M104 90c20-17 38-13 55 1" fill="none" {...lightLine} />
-          <Path d="M216 90c-20-17-38-13-55 1" fill="none" {...lightLine} />
-          <Path d="M54 90h35" fill="none" {...line} />
-          <Path d="m79 82 10 8-10 8" fill="none" {...line} />
-          <Path d="M266 90h-35" fill="none" {...line} />
-          <Path d="m241 82-10 8 10 8" fill="none" {...line} />
-          <Circle cx="160" cy="91" r="8" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
+          <Path d="M86 46c-17 0-30 14-30 31 0 12 6 22 16 28-4 21 17 34 35 22 8 11 23 13 34 4V48c-15-10-34-7-43 6-3-5-7-8-12-8Z" fill={colors.orangeSoft} stroke={colors.ink} strokeWidth="3.2" />
+          <Path d="M234 46c17 0 30 14 30 31 0 12-6 22-16 28 4 21-17 34-35 22-8 11-23 13-34 4V48c15-10 34-7 43 6 3-5 7-8 12-8Z" fill={colors.purpleSoft} stroke={colors.ink} strokeWidth="3.2" />
+          <Path d="M160 50v80" fill="none" {...line} />
+          <Path d="M45 89h43M275 89h-43" fill="none" stroke={colors.blue} strokeWidth="7" strokeLinecap="round" />
+          <Path d="m77 79 12 10-12 10M243 79l-12 10 12 10" fill="none" {...line} />
+          <Circle cx="160" cy="90" r="11" fill={colors.green} stroke={colors.ink} strokeWidth="2.6" />
+          <Circle cx="160" cy="90" r="24" fill="none" stroke={colors.yellow} strokeWidth="5" />
         </>
       )}
 
       {name === 'connection' && (
         <>
-          <Circle cx="78" cy="91" r="22" fill={colors.orange} stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="160" cy="43" r="22" fill={colors.green} stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="242" cy="91" r="22" fill={colors.purple} stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="160" cy="139" r="22" fill={colors.blue} stroke={colors.ink} strokeWidth="3" />
-          <Line x1="98" y1="79" x2="140" y2="55" {...line} />
-          <Line x1="180" y1="55" x2="222" y2="79" {...line} />
-          <Line x1="222" y1="103" x2="180" y2="127" {...line} />
-          <Line x1="140" y1="127" x2="98" y2="103" {...line} />
-          <Circle cx="160" cy="91" r="10" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
-          <Line x1="160" y1="65" x2="160" y2="81" {...lightLine} />
-          <Line x1="100" y1="91" x2="150" y2="91" {...lightLine} />
-          <Line x1="170" y1="91" x2="220" y2="91" {...lightLine} />
-          <Line x1="160" y1="101" x2="160" y2="117" {...lightLine} />
+          <Path d="M66 93 160 37l94 56-94 54Z" fill={colors.blueSoft} stroke={colors.ink} strokeWidth="3" strokeLinejoin="round" />
+          <Circle cx="66" cy="93" r="23" fill={colors.orange} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="160" cy="37" r="23" fill={colors.green} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="254" cy="93" r="23" fill={colors.purple} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="160" cy="147" r="23" fill={colors.blue} stroke={colors.ink} strokeWidth="3" />
+          <Circle cx="160" cy="93" r="13" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.8" />
+          <Path d="M160 61v18M89 93h57M174 93h57M160 107v17" fill="none" {...lightLine} />
         </>
       )}
 
       {name === 'complete' && (
         <>
-          <Path d="M76 42h74v96H76Z" fill={colors.surfaceSoft} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M170 42h74v96h-74Z" fill={colors.warmNote} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M150 42 113 72v66l37-18Z" fill={colors.purple} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M170 42 207 72v66l-37-18Z" fill={colors.green} stroke={colors.ink} strokeWidth="3" />
-          <Circle cx="160" cy="93" r="23" fill={colors.yellow} stroke={colors.ink} strokeWidth="3" />
-          <Path d="m149 94 8 8 15-18" fill="none" {...line} />
+          <Path d="M76 35c-26 0-46 19-46 45s20 45 46 45V104c-14 0-24-10-24-24s10-24 24-24Z" fill={colors.ink} />
+          <Path d="M72 61 145 41v79l-73-18Z" fill={colors.purple} stroke={colors.ink} strokeWidth="3" strokeLinejoin="round" />
+          <Path d="M137 45 232 18v116l-95-28Z" fill={colors.orange} stroke={colors.ink} strokeWidth="3" strokeLinejoin="round" />
+          <Path d="m57 104 80 20-43 27-65-19Z" fill={colors.green} stroke={colors.ink} strokeWidth="3" strokeLinejoin="round" />
+          <Circle cx="246" cy="109" r="27" fill={colors.yellow} stroke={colors.ink} strokeWidth="3" />
+          <Path d="m233 110 9 9 18-22" fill="none" {...line} />
         </>
       )}
     </Svg>
@@ -189,71 +231,85 @@ export function CurioTopicVisual({
 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 96 96">
-      <Rect x="8" y="8" width="80" height="80" rx="24" fill={colors.surfaceSoft} />
       {name === 'earth' && (
         <>
-          <Circle cx="48" cy="45" r="25" fill="#EAF4FF" stroke={colors.ink} strokeWidth="3" />
-          <Path d="M24 47c10-7 18-3 25 1 8 5 14 8 23 1" fill="none" {...lightLine} />
-          <Path d="M48 20c-7 8-10 17-10 25s3 18 10 25M48 20c7 8 10 17 10 25s-3 18-10 25" fill="none" {...lightLine} />
-          <Circle cx="70" cy="24" r="8" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="47" cy="48" r="33" fill={colors.blue} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M21 39c8-9 14-13 22-12 2 8 8 12 15 14-4 7-4 14 1 20-8 3-15 1-21-5-7-6-12-10-17-17Z" fill={colors.green} stroke={colors.ink} strokeWidth="2.2" strokeLinejoin="round" />
+          <Path d="M58 22c8 1 15 6 19 14-6 4-10 9-12 16-6-4-11-10-15-18 1-5 4-9 8-12Z" fill={colors.yellowSoft} stroke={colors.ink} strokeWidth="2.2" strokeLinejoin="round" />
+          <Circle cx="75" cy="20" r="9" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.4" />
         </>
       )}
+
       {name === 'life' && (
         <>
-          <Path d="M22 66c4-35 28-48 53-43 0 30-20 52-48 52Z" fill="#E8F8EE" stroke={colors.ink} strokeWidth="3" />
-          <Path d="M28 71c15-17 26-28 43-43" fill="none" {...line} />
-          <Circle cx="35" cy="59" r="6" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
+          <Path d="M13 73c5-46 36-62 69-55 0 39-27 68-63 67Z" fill={colors.green} stroke={colors.ink} strokeWidth="3.2" strokeLinejoin="round" />
+          <Path d="M21 79c20-23 35-38 57-57" fill="none" {...line} />
+          <Circle cx="31" cy="64" r="7" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
+          <Path d="m57 31 10-5-4 11" fill={colors.orange} stroke={colors.ink} strokeWidth="2.2" strokeLinejoin="round" />
         </>
       )}
+
       {name === 'brain' && (
         <>
-          <Path d="M46 23c-9-10-24-5-23 8-10 2-10 17-2 20-5 12 8 25 25 18Z" fill="#F3ECFA" stroke={colors.ink} strokeWidth="3" />
-          <Path d="M50 23c9-10 24-5 23 8 10 2 10 17 2 20 5 12-8 25-25 18Z" fill="#F3ECFA" stroke={colors.ink} strokeWidth="3" />
-          <Line x1="48" y1="23" x2="48" y2="69" {...lightLine} />
-          <Circle cx="36" cy="45" r="6" fill={colors.purple} stroke={colors.ink} strokeWidth="2.5" />
+          <Path
+            d="M48 14C42 8 32 9 28 14c-8-2-14 4-13 12-7 4-6 14 0 18-3 8 3 17 11 17 2 8 12 13 22 7 10 6 20 1 22-7 8 0 14-9 11-17 6-4 7-14 0-18 1-8-5-14-13-12-4-5-14-6-20 0Z"
+            fill={colors.purple}
+            stroke={colors.ink}
+            strokeWidth="3.4"
+            strokeLinejoin="round"
+          />
+          <Path d="M48 15v53" fill="none" stroke={colors.ink} strokeWidth="3" strokeLinecap="round" />
+          <Path d="M28 23c8-4 14 2 13 9M19 36c8-3 16 1 19 8M25 52c6-5 13-3 16 3" fill="none" {...lightLine} />
+          <Path d="M68 23c-8-4-14 2-13 9M77 36c-8-3-16 1-19 8M71 52c-6-5-13-3-16 3" fill="none" {...lightLine} />
+          <Circle cx="29" cy="31" r="5.5" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.2" />
         </>
       )}
+
       {name === 'cognition' && (
         <>
-          <Rect x="22" y="24" width="52" height="48" rx="18" fill={colors.warmNote} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M31 55c12-15 23-19 34-23" fill="none" {...line} />
-          <Circle cx="32" cy="56" r="6" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="64" cy="32" r="6" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
-          <Path d="m57 31 8 1-4 7" fill="none" {...lightLine} />
+          <Path d="M17 57c0-24 13-40 32-40 18 0 31 14 31 34 0 13-5 22-14 30H31C22 74 17 66 17 57Z" fill={colors.orangeSoft} stroke={colors.ink} strokeWidth="3.2" />
+          <Path d="M26 65c16-21 31-34 47-43" fill="none" stroke={colors.orange} strokeWidth="6" strokeLinecap="round" />
+          <Circle cx="27" cy="65" r="7" fill={colors.orange} stroke={colors.ink} strokeWidth="2.4" />
+          <Circle cx="72" cy="23" r="8" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.4" />
+          <Path d="m63 22 10 1-5 9" fill="none" {...lightLine} />
         </>
       )}
+
       {name === 'society' && (
         <>
-          <Circle cx="25" cy="49" r="9" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="52" cy="26" r="9" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="72" cy="58" r="9" fill={colors.purple} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="43" cy="72" r="8" fill={colors.blue} stroke={colors.ink} strokeWidth="2.5" />
-          <Line x1="32" y1="43" x2="45" y2="32" {...lightLine} />
-          <Line x1="59" y1="33" x2="68" y2="49" {...lightLine} />
-          <Line x1="64" y1="64" x2="51" y2="69" {...lightLine} />
-          <Line x1="35" y1="65" x2="28" y2="57" {...lightLine} />
+          <Path d="M21 51 52 21l24 37-34 22Z" fill={colors.blueSoft} stroke={colors.ink} strokeWidth="2.6" strokeLinejoin="round" />
+          <Circle cx="21" cy="51" r="11" fill={colors.orange} stroke={colors.ink} strokeWidth="2.8" />
+          <Circle cx="52" cy="21" r="11" fill={colors.green} stroke={colors.ink} strokeWidth="2.8" />
+          <Circle cx="76" cy="58" r="11" fill={colors.purple} stroke={colors.ink} strokeWidth="2.8" />
+          <Circle cx="42" cy="80" r="10" fill={colors.blue} stroke={colors.ink} strokeWidth="2.8" />
+          <Circle cx="50" cy="51" r="7" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.4" />
         </>
       )}
+
       {name === 'body' && (
         <>
-          <Circle cx="48" cy="28" r="10" fill={colors.yellow} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M48 38v23M34 48l14 7 14-7M40 75l8-14 8 14" fill="none" {...line} />
-          <Line x1="25" y1="75" x2="71" y2="75" stroke={colors.green} strokeWidth="5" strokeLinecap="round" />
+          <Circle cx="48" cy="23" r="11" fill={colors.yellow} stroke={colors.ink} strokeWidth="3" />
+          <Path d="M31 40c7-6 27-6 34 0l5 20-12 21H38L26 60Z" fill={colors.orangeSoft} stroke={colors.ink} strokeWidth="3" strokeLinejoin="round" />
+          <Path d="M48 39v41M28 53h40" fill="none" {...lightLine} />
+          <Path d="M42 52c0-5 3-9 7-9 5 0 8 4 8 9 0 7-6 11-8 13-3-2-7-6-7-13Z" fill={colors.orange} stroke={colors.ink} strokeWidth="2.2" />
         </>
       )}
+
       {name === 'technology' && (
         <>
-          <Rect x="28" y="28" width="40" height="40" rx="10" fill="#EAF4FF" stroke={colors.ink} strokeWidth="3" />
-          <Rect x="39" y="39" width="18" height="18" rx="5" fill={colors.blue} stroke={colors.ink} strokeWidth="2.5" />
-          <Path d="M35 20v8M48 20v8M61 20v8M35 68v8M48 68v8M61 68v8M20 35h8M20 48h8M20 61h8M68 35h8M68 48h8M68 61h8" fill="none" {...lightLine} />
+          <Rect x="22" y="22" width="52" height="52" rx="13" fill={colors.blue} stroke={colors.ink} strokeWidth="3" />
+          <Rect x="36" y="36" width="24" height="24" rx="6" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.6" />
+          <Path d="M31 12v10M48 12v10M65 12v10M31 74v10M48 74v10M65 74v10M12 31h10M12 48h10M12 65h10M74 31h10M74 48h10M74 65h10" fill="none" {...lightLine} />
         </>
       )}
+
       {name === 'science' && (
         <>
-          <Path d="m37 19 18 8-10 22-18-8Z" fill="#F3ECFA" stroke={colors.ink} strokeWidth="3" />
-          <Path d="M48 47c18 4 21 22 10 28H27" fill="none" {...line} />
-          <Line x1="28" y1="48" x2="44" y2="54" {...line} />
-          <Line x1="23" y1="75" x2="69" y2="75" stroke={colors.green} strokeWidth="5" strokeLinecap="round" />
+          <Path d="m34 14 23 10-12 28-23-10Z" fill={colors.purple} stroke={colors.ink} strokeWidth="3.2" />
+          <Path d="M49 50c22 5 27 27 12 35H20" fill="none" {...line} />
+          <Path d="M25 51 44 58" fill="none" {...line} />
+          <Path d="M18 84h59" fill="none" stroke={colors.green} strokeWidth="7" strokeLinecap="round" />
+          <Circle cx="65" cy="34" r="8" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.4" />
         </>
       )}
     </Svg>
@@ -268,39 +324,37 @@ export function CurioEmptyStateIllustration({
   width?: number;
 }) {
   const height = Math.round(width * 0.64);
-
   return (
     <Svg width={width} height={height} viewBox="0 0 220 140">
       {name === 'no-reviews' && (
         <>
-          <Circle cx="110" cy="68" r="43" fill={colors.surfaceSoft} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M110 43v27l18 11" fill="none" {...line} />
-          <Circle cx="110" cy="68" r="6" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="58" cy="31" r="9" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="110" cy="68" r="45" fill={colors.purpleSoft} stroke={colors.ink} strokeWidth="3.2" />
+          <Path d="M110 42v28l19 12" fill="none" {...line} />
+          <Circle cx="110" cy="68" r="7" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="58" cy="31" r="10" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.5" />
         </>
       )}
       {name === 'no-saved' && (
         <>
-          <Path d="M77 24h66v91l-33-22-33 22Z" fill={colors.warmNote} stroke={colors.ink} strokeWidth="3" />
-          <Line x1="92" y1="43" x2="128" y2="43" stroke={colors.orange} strokeWidth="5" strokeLinecap="round" />
-          <Circle cx="154" cy="102" r="10" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
+          <Path d="M76 22h68v94l-34-23-34 23Z" fill={colors.yellowSoft} stroke={colors.ink} strokeWidth="3.2" />
+          <Line x1="91" y1="43" x2="129" y2="43" stroke={colors.orange} strokeWidth="6" strokeLinecap="round" />
+          <Circle cx="155" cy="102" r="11" fill={colors.green} stroke={colors.ink} strokeWidth="2.5" />
         </>
       )}
       {name === 'coming-soon' && (
         <>
-          <Rect x="49" y="28" width="122" height="84" rx="24" fill={colors.surfaceSoft} stroke={colors.ink} strokeWidth="3" />
-          <Path d="M80 87c18-35 42-44 67-37" fill="none" {...line} />
-          <Circle cx="80" cy="87" r="8" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
-          <Circle cx="147" cy="50" r="8" fill={colors.purple} stroke={colors.ink} strokeWidth="2.5" />
-          <Path d="m138 48 10 2-5 9" fill="none" {...lightLine} />
+          <Rect x="47" y="26" width="126" height="88" rx="26" fill={colors.orangeSoft} stroke={colors.ink} strokeWidth="3.2" />
+          <Path d="M79 89c19-37 44-46 70-39" fill="none" stroke={colors.orange} strokeWidth="6" strokeLinecap="round" />
+          <Circle cx="79" cy="89" r="9" fill={colors.orange} stroke={colors.ink} strokeWidth="2.5" />
+          <Circle cx="149" cy="50" r="9" fill={colors.purple} stroke={colors.ink} strokeWidth="2.5" />
         </>
       )}
       {name === 'offline' && (
         <>
-          <Circle cx="110" cy="69" r="44" fill="#EAF4FF" stroke={colors.ink} strokeWidth="3" />
-          <Path d="M76 69c19-18 49-18 68 0M88 82c12-11 32-11 44 0" fill="none" {...line} />
-          <Circle cx="110" cy="97" r="5" fill={colors.blue} />
-          <Line x1="72" y1="31" x2="151" y2="110" stroke={colors.orange} strokeWidth="6" strokeLinecap="round" />
+          <Circle cx="110" cy="69" r="46" fill={colors.blueSoft} stroke={colors.ink} strokeWidth="3.2" />
+          <Path d="M76 69c19-18 49-18 68 0M88 82c12-11 32-11 44 0" fill="none" stroke={colors.blue} strokeWidth="5" strokeLinecap="round" />
+          <Circle cx="110" cy="97" r="6" fill={colors.blue} />
+          <Line x1="72" y1="31" x2="151" y2="110" stroke={colors.orange} strokeWidth="7" strokeLinecap="round" />
         </>
       )}
     </Svg>
