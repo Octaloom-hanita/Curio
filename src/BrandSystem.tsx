@@ -87,12 +87,15 @@ export function CurioLogoLockup({
   height?: number;
   mono?: boolean;
 }) {
-  const width = Math.round(height * 3.35);
+  // Deliberate safe area around the full approved lockup so neither
+  // the Opening nor the wordmark can touch the SVG crop.
+  const width = Math.round(height * 3.05);
   return (
     <Svg
       width={width}
       height={height}
-      viewBox="0 0 420 125"
+      viewBox="-12 -8 440 145"
+      preserveAspectRatio="xMidYMid meet"
       accessibilityElementsHidden
       focusable={false}
     >

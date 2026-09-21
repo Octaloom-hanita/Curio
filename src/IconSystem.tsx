@@ -228,10 +228,17 @@ export function CurioIcon({
       </>}
 
       {name === 'brain' && <>
-        <Path d="M31 14c-7-7-17-4-17 5-8 1-9 13-2 16-4 9 5 18 19 13Z" fill={colors.purpleSoft} stroke={color} strokeWidth={3} strokeLinejoin="round" />
-        <Path d="M33 14c7-7 17-4 17 5 8 1 9 13 2 16 4 9-5 18-19 13Z" fill={colors.purpleSoft} stroke={color} strokeWidth={3} strokeLinejoin="round" />
-        <Line x1="32" y1="15" x2="32" y2="48" {...s} />
-        <Circle cx="23" cy="29" r="4" fill={a} />
+        <Path
+          d="M32 10C28 6 21 6 18 10c-5-1-9 3-8 8-5 3-4 10 0 13-2 6 2 12 8 12 1 6 8 9 14 5 6 4 13 1 14-5 6 0 10-6 8-12 4-3 5-10 0-13 1-5-3-9-8-8-3-4-10-4-14 0Z"
+          fill={colors.purpleSoft}
+          stroke={color}
+          strokeWidth={3}
+          strokeLinejoin="round"
+        />
+        <Path d="M32 11v37" fill="none" stroke={color} strokeWidth={2.6} strokeLinecap="round" />
+        <Path d="M19 18c5-2 9 1 9 6M14 29c5-2 10 0 12 5M18 40c4-3 8-2 11 1" fill="none" stroke={color} strokeWidth={2.3} strokeLinecap="round" />
+        <Path d="M45 18c-5-2-9 1-9 6M50 29c-5-2-10 0-12 5M46 40c-4-3-8-2-11 1" fill="none" stroke={color} strokeWidth={2.3} strokeLinecap="round" />
+        <Circle cx="21" cy="25" r="3.4" fill={a} />
       </>}
 
       {name === 'earth' && <>

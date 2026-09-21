@@ -251,11 +251,17 @@ export function CurioTopicVisual({
 
       {name === 'brain' && (
         <>
-          <Path d="M45 15c-11-11-28-5-28 9-12 2-13 20-3 24-6 15 10 31 31 23Z" fill={colors.purple} stroke={colors.ink} strokeWidth="3.2" />
-          <Path d="M51 15c11-11 28-5 28 9 12 2 13 20 3 24 6 15-10 31-31 23Z" fill="#D8B0F2" stroke={colors.ink} strokeWidth="3.2" />
-          <Path d="M48 17v55M28 35c9 2 14 7 17 16M68 34c-8 3-13 8-16 16" fill="none" {...lightLine} />
-          <Circle cx="33" cy="51" r="7" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.4" />
-          <Circle cx="63" cy="35" r="6" fill={colors.blue} stroke={colors.ink} strokeWidth="2.4" />
+          <Path
+            d="M48 14C42 8 32 9 28 14c-8-2-14 4-13 12-7 4-6 14 0 18-3 8 3 17 11 17 2 8 12 13 22 7 10 6 20 1 22-7 8 0 14-9 11-17 6-4 7-14 0-18 1-8-5-14-13-12-4-5-14-6-20 0Z"
+            fill={colors.purple}
+            stroke={colors.ink}
+            strokeWidth="3.4"
+            strokeLinejoin="round"
+          />
+          <Path d="M48 15v53" fill="none" stroke={colors.ink} strokeWidth="3" strokeLinecap="round" />
+          <Path d="M28 23c8-4 14 2 13 9M19 36c8-3 16 1 19 8M25 52c6-5 13-3 16 3" fill="none" {...lightLine} />
+          <Path d="M68 23c-8-4-14 2-13 9M77 36c-8-3-16 1-19 8M71 52c-6-5-13-3-16 3" fill="none" {...lightLine} />
+          <Circle cx="29" cy="31" r="5.5" fill={colors.yellow} stroke={colors.ink} strokeWidth="2.2" />
         </>
       )}
 
